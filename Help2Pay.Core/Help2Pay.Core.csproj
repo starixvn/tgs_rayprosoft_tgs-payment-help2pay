@@ -15,4 +15,8 @@
     <PackageReference Include="TGS.ServiceUtility" Version="0.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Tgs.Payment.Help2Pay.Client\Tgs.Payment.Help2Pay.Client.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.Help2Pay;
+using Tgs.Payment.Help2Pay.MessageQueue;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -13,15 +14,18 @@ public static class ServiceCollectionExtensions
             .Configure(configure)
             .Services
             .RegisterAllServiceUtilityTypes(Assembly.GetExecutingAssembly(), ServiceLifetime.Transient)
-            .AddSingleton<Help2PayHasher>()
+            .AddTransient<Help2PayHasher>()
+            .AddTransient<Help2PaySerializer>()
             .AddMessageQueue()
             .AddNatsMessageQueue(config =>
             {
-                config.ConfigQueueOptions((options, sp) =>
-                {
-                    var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
-                    options.Url = help2PayOptions.NatsUrl;
-                });
+                config
+                    .ConfigQueueOptions((options, sp) =>
+                    {
+                        var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
+                        options.Url = help2PayOptions.NatsUrl;
+                    })
+                    .AddProcessor<DepositProcessor>("tgs.payment.help2pay.deposit", "tgs.payment.help2pay.deposit");
             })
             .AddNatsGlobPatternExchange("*");
 
