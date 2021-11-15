@@ -29,6 +29,15 @@ public static class ServiceCollectionExtensions
             })
             .AddNatsGlobPatternExchange("*");
 
+        services
+            .AddHttpClient<Help2PayClient>()
+            .ConfigureHttpClient((sp, httpClient)
+            =>
+            {
+                var options = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
+                httpClient.BaseAddress = options.PaymentApiUrl;
+            });
+
         return services;
     }
 }

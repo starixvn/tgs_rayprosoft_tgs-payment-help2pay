@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
 using System.Security.Cryptography;
+using System.Text;
+using NUnit.Framework;
 
 namespace Tgs.Payment.Help2Pay.Tests;
 
@@ -12,7 +10,7 @@ namespace Tgs.Payment.Help2Pay.Tests;
 public class HasherTests
 {
     [Test]
-    public void Should_Match_Help2Pay_Hash_Rule()
+    public void Should_Match_Help2Pay_Deposit_Hash_Rule()
     {
         var sut = new Help2PayHasher();
 
@@ -22,46 +20,22 @@ public class HasherTests
         var currency = "PHP";
         var customer = "customer";
         var referenceId = Guid.NewGuid();
-        var now = DateTimeOffset.Now;
+        var now = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8)).DateTime;
         var amount = 71m;
         var ip = "127.0.0.1";
 
-        //var dict = new Dictionary<string, object>
-        //{
-        //    ["Merchant"] = merchant,
-        //    ["Currency"] = currency,
-        //    ["Customer"] = customer,
-        //    ["Reference"] = referenceId,
-        //    ["Amount"] = amount,
-        //    ["DateTime"] = now,
-        //    ["FrontURI"] = "http://www.google.com",
-        //    ["BackURI"] = "http://www.google.com",
-        //    ["Bank"] = "BDO",
-        //    ["Language"] = "en-us",
-        //    ["ClientIP"] = ip
-        //};
+        var info = new DepositHasherInfo(customer, currency, amount, referenceId, now);
 
-        //var expected = HashCode(securityCode, merchant, customer, referenceId, currency, now, amount, ip);
+        var data = $"{merchant}{referenceId}{customer}{amount:f2}{currency}{now:yyyyMMddHHmmss}{securityCode}{ip}";
+        var expected = HashCode(data);
 
-        //var actual = sut.ComputeHash(securityCode, dict);
+        var actual = sut.ComputeHash(merchant, securityCode, info, ip);
 
-        //Assert.AreEqual(expected, actual);
+        Assert.AreEqual(expected, actual);
     }
 
-    private string HashCode(
-        string securityCode,
-        string merchant,
-        string customer,
-        Guid referenceId,
-        string currecy,
-        DateTimeOffset now,
-        decimal amount,
-        string ip)
-    {
-        var data = $"{merchant}{referenceId}{customer}{amount:f2}{currecy}{now:yyyyMMddHHmmss}{securityCode}{ip}";
-
-        return string.Join(
+    private string HashCode(string original)
+        => string.Join(
                 string.Empty,
-                MD5.HashData(Encoding.UTF8.GetBytes(data)).Select(b => b.ToString("x2")));
-    }
+                MD5.HashData(Encoding.UTF8.GetBytes(original)).Select(b => b.ToString("x2")));
 }

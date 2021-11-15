@@ -1,6 +1,9 @@
-﻿using System.Security.Cryptography;
+﻿using System.Numerics;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using Tgs.Payment.Help2Pay.Converters;
 
 namespace Tgs.Payment.Help2Pay;
 
@@ -8,26 +11,65 @@ public class Help2PayHasher
 {
     private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
     {
-        WriteIndented = false
+        WriteIndented = false,
+        Converters =
+        {
+            new SignedDateTimeJsonConverter(),
+            new DecimalJsonConverter()
+        }
     };
 
-    public string ComputeHash<T>(T info)
+    private readonly Dictionary<string, int> _weight = new Dictionary<string, int>
     {
-        //var merchant = parameters.ContainsKey("Merchant") ? $"{parameters["Merchant"]}" : string.Empty;
-        //var reference = parameters.ContainsKey("Reference") ? $"{parameters["Reference"]}" : string.Empty;
-        //var customer = parameters.ContainsKey("Customer") ? $"{parameters["Customer"]}" : string.Empty;
-        //var amount = parameters.ContainsKey("Amount") ? $"{(decimal)parameters["Amount"]:f2}" : string.Empty;
-        //var currency = parameters.ContainsKey("Currency") ? $"{parameters["Currency"]}" : string.Empty;
-        //var datetime = parameters.ContainsKey("DateTime") ? $"{(DateTimeOffset)parameters["DateTime"]:yyyyMMddHHmmss}" : string.Empty;
-        //var clientIp = parameters.ContainsKey("ClientIP") ? $"{parameters["ClientIP"]}" : string.Empty;
+        ["Reference"] = 1,
+        ["TransactionID"] = 1,
+        ["Customer"] = 2,
+        ["MemberCode"] = 2,
+        ["Amount"] = 3,
+        ["CurrencyCode"] = 4,
+        ["Currency"] = 4,
+        ["Datetime"] = 5,
+        ["TransactionDateTime"] = 5,
+        ["ToBankAccountNumber"] = 6,
+        ["Status"] = 7
+    };
 
-        var values = JsonSerializer.Serialize(info, _jsonSerializerOptions);
-        var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(values, _jsonSerializerOptions)!;
+    //public string ComputeHash(string merchantCode, string securityCode, IDictionary<string, object> dict, string? ip)
+    //{
+    //    var content = string.Join(
+    //        "",
+    //        dict.OrderBy(p => _weight[p.Key])
+    //        .Select(p => p.Value switch
+    //        {
+    //            DateTimeOffset => $"{p.Value:yyyyMMddHHmmss}",
+    //            decimal => $"{p.Value:f2}",
+    //            _ => $"{p.Value ?? "null"}"
+    //        }));
 
-        var data = string.Join(string.Empty, dict.Values);
-        var hash = string.Join(
-            string.Empty,
-            MD5.HashData(Encoding.UTF8.GetBytes(data)).Select(b => b.ToString("x2")));
+    //    var data = $"{merchantCode}{content}{securityCode}{ip}";
+
+    //    //var hash = string.Join(
+    //    //    "",
+    //    //    MD5.HashData(Encoding.UTF8.GetBytes(data)).Select(b => b.ToString("x2")));
+
+    //    var hash = new BigInteger(MD5.HashData(Encoding.UTF8.GetBytes(data)), isBigEndian: true).ToString("x");
+
+    //    return hash;
+    //}
+
+    public string ComputeHash<T>(string merchantCode, string securityCode, T data, string? ip)
+    {
+        var json = JsonSerializer.Serialize(data, _jsonSerializerOptions);
+        var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
+
+        var content = string.Join(
+            "",
+            dict.OrderBy(p => _weight[p.Key])
+            .Select(p => p.Value ?? "null"));
+
+        var value = $"{merchantCode}{content}{securityCode}{ip}";
+
+        var hash = new BigInteger(MD5.HashData(Encoding.UTF8.GetBytes(value)), isBigEndian: true).ToString("x");
 
         return hash;
     }
