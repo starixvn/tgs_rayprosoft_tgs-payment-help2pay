@@ -33,8 +33,6 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseAuthorization();
-
 app.MapControllers();
 app.MapGet("/", async context => await context.Response.WriteAsync("Hello World"));
 
