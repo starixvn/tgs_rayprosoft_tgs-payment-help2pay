@@ -49,7 +49,7 @@ internal class Help2PayClient
             PlayerCode = order.PlayerCode,
             ClientIp = ip,
             Hash = hash,
-            TransactionId = order.TransactionId,
+            ReferenceId = order.TransactionId,
             TransactionTime = order.TransactionTime,
             BankCode = order.BankCode,
             CallbackUrl = order.CallbackUrl,
@@ -70,6 +70,11 @@ internal class Help2PayClient
         _logger.LogInformation($"Deposit Body: {html}");
 
         response.EnsureSuccessStatusCode();
+
+        if (string.IsNullOrWhiteSpace(html))
+        {
+            throw new ApiException("Responsed html should not be null or empty.");
+        }
 
         return new Help2PayDepositResponse(html);
     }

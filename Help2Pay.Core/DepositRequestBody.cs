@@ -14,13 +14,12 @@ internal record DepositRequestBody
     public string MerchantId { get; init; } = default!;
 
     [JsonPropertyName("Reference")]
-    public Guid TransactionId { get; init; }
+    public Guid ReferenceId { get; init; }
 
     [JsonPropertyName("Customer")]
     public string PlayerCode { get; init; } = default!;
 
     [JsonPropertyName("Amount")]
-    [JsonConverter(typeof(DecimalJsonConverter))]
     public decimal Amount { get; init; }
 
     [JsonPropertyName("Currency")]
