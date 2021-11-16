@@ -57,7 +57,7 @@ public class Help2PayHasher
     //    return hash;
     //}
 
-    public string ComputeHash<T>(string merchantCode, string securityCode, T data, string? ip)
+    public string ComputeHash<T>(string merchantId, string securityCode, T data, string? ip = null)
     {
         var json = JsonSerializer.Serialize(data, _jsonSerializerOptions);
         var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
@@ -65,9 +65,9 @@ public class Help2PayHasher
         var content = string.Join(
             "",
             dict.OrderBy(p => _weight[p.Key])
-            .Select(p => p.Value ?? "null"));
+            .Select(p => p.Value));
 
-        var value = $"{merchantCode}{content}{securityCode}{ip}";
+        var value = $"{merchantId}{content}{securityCode}{ip}";
 
         var hash = new BigInteger(MD5.HashData(Encoding.UTF8.GetBytes(value)), isBigEndian: true).ToString("x");
 
