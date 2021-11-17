@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.Help2Pay;
 using Tgs.Payment.Help2Pay.MessageQueue;
@@ -37,6 +39,23 @@ public static class ServiceCollectionExtensions
                 var options = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
                 httpClient.BaseAddress = options.PaymentApiUrl;
             });
+
+        services
+            .AddPaymentServiceClient((options, sp) =>
+            {
+                var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
+                options.PaymentServiceBaseUrl = help2PayOptions.PaymentServiceBaseUrl;
+
+                options.JsonSerializerOptions = options.JsonSerializerOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    Converters =
+                        {
+                            new JsonStringEnumConverter()
+                        }
+                };
+            })
+            .AddPaymentClient();
 
         return services;
     }
