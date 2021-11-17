@@ -32,12 +32,21 @@ public static class ServiceCollectionExtensions
             .AddNatsGlobPatternExchange("*");
 
         services
-            .AddHttpClient<Help2PayClient>()
+            .AddHttpClient<Help2PayDepositClient>()
             .ConfigureHttpClient((sp, httpClient)
             =>
             {
                 var options = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
-                httpClient.BaseAddress = options.PaymentApiUrl;
+                httpClient.BaseAddress = options.PaymentDepositApiUrl;
+            });
+
+        services
+            .AddHttpClient<Help2PayQueryClient>()
+            .ConfigureHttpClient((sp, httpClient)
+            =>
+            {
+                var options = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
+                httpClient.BaseAddress = options.PaymentQueryApiUrl;
             });
 
         services

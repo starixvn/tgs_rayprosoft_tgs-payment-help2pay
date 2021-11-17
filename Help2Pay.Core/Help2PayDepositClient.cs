@@ -4,11 +4,11 @@ using Tgs.Payment.Help2Pay.Converters;
 
 namespace Tgs.Payment.Help2Pay;
 
-internal class Help2PayClient
+internal class Help2PayDepositClient
 {
     private readonly HttpClient _httpClient;
     private readonly Help2PayHasher _hasher;
-    private readonly ILogger<Help2PayClient> _logger;
+    private readonly ILogger<Help2PayDepositClient> _logger;
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
     {
@@ -20,17 +20,17 @@ internal class Help2PayClient
         }
     };
 
-    public Help2PayClient(
+    public Help2PayDepositClient(
         HttpClient httpClient,
         Help2PayHasher hasher,
-        ILogger<Help2PayClient> logger)
+        ILogger<Help2PayDepositClient> logger)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async ValueTask<Help2PayDepositResponse> DepositAsync(string merchantId, string securityCode, DepositOrder order, string? ip)
+    public async ValueTask<string> DepositAsync(string merchantId, string securityCode, DepositOrder order, string? ip)
     {
         var info = new DepositHasherInfo(
             order.PlayerCode,
@@ -76,7 +76,7 @@ internal class Help2PayClient
             throw new ApiException("Responsed html should not be null or empty.");
         }
 
-        return new Help2PayDepositResponse(html);
+        return html;
     }
 
     private IEnumerable<KeyValuePair<string, string>> SerializeToFormParameters<T>(T data)

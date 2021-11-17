@@ -8,7 +8,9 @@ public class Help2PayOptions
 
     public string NatsUrl { get; set; } = default!;
 
-    public Uri PaymentApiUrl { get; set; } = default!;
+    public Uri PaymentDepositApiUrl { get; set; } = default!;
+
+    public Uri PaymentQueryApiUrl { get; set; } = default!;
 
     public JsonSerializerOptions? SystemSerializerOptions { get; set; }
 
