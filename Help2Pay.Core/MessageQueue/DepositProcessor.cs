@@ -40,7 +40,7 @@ internal class DepositProcessor : IMessageProcessor
             TransactionId = settings.TransactionId,
             TransactionTime = DateTimeOffset.UtcNow.ToOffset(_TimeSpan).DateTime,
             ResponseUrl = settings.ResponseUrl,
-            CallbackUrl = $"{_options.CallbackBaseUrl}/deposit/callback"
+            CallbackUrl = $"{_options.CallbackBaseUrl}/api/deposit/callback"
         };
 
         var response = await _help2PayClient

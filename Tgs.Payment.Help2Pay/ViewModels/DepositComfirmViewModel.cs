@@ -38,7 +38,7 @@ public class DepositComfirmViewModel
     public string Status { get; init; } = default!;
 
     [FromForm(Name = "ErrorCode")]
-    public string ErrorCode { get; init; } = default!;
+    public string? ErrorCode { get; init; } = default!;
 
     [FromForm(Name = "Note")]
     public string? Note { get; init; }

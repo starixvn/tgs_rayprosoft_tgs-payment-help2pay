@@ -9,5 +9,5 @@ public record Help2PayDepositReturn(
     string TransactionTime,
     string StatementTime,
     string StatusCode,
-    string ErrorCode,
+    string? ErrorCode,
     string? Note);

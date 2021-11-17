@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.Clients;
@@ -21,7 +22,7 @@ public class DepositController : ControllerBase
     }
 
     [HttpPost("callback")]
-    public async Task DepositCallbackAsync(
+    public async Task<IActionResult> DepositCallbackAsync(
         [FromServices] IOptions<Help2PayOptions> options,
         [FromServices] IGetService<GetDepositFormQuery, DepositFormInfo?> getDepositFormService,
         [FromServices] IGetService<VerifyHashCommand, bool> verifyHashCommandService,
@@ -30,6 +31,8 @@ public class DepositController : ControllerBase
         [FromForm] DepositComfirmViewModel depositModel)
     {
         var jsonSerializerOptions = options.Value.SystemSerializerOptions;
+        var data = JsonSerializer.Serialize(depositModel, jsonSerializerOptions);
+        _logger.LogInformation($"callback: {data}");
 
         var depositForm = await getDepositFormService
             .GetAsync(new GetDepositFormQuery(depositModel.ReferenceId))
@@ -81,6 +84,8 @@ public class DepositController : ControllerBase
 
                 await approveService.ExecuteAsync(approveCommand).ConfigureAwait(false);
             }
+
+            return Ok("success");
         }
 
         throw new Exception();
