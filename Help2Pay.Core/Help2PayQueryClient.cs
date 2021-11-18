@@ -10,8 +10,8 @@ namespace Tgs.Payment.Help2Pay;
 
 internal class Help2PayQueryClient
 {
-    private readonly ILogger<Help2PayQueryClient> _logger;
     private readonly HttpClient _httpClient;
+    private readonly ILogger<Help2PayQueryClient> _logger;
 
     public Help2PayQueryClient(
         ILogger<Help2PayQueryClient> logger,
@@ -31,7 +31,7 @@ internal class Help2PayQueryClient
 
         var data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-        _logger.LogInformation($"Query Payment Deposit Id  Body: {data}");
+        _logger.LogInformation($"Query Payment Deposit Id Body: {data}");
 
         response.EnsureSuccessStatusCode();
 
@@ -45,5 +45,31 @@ internal class Help2PayQueryClient
         }
 
         throw new ApiException($"Payment Deposit Id should not be null or empty: {data}");
+    }
+
+    public async ValueTask<string> QueryPaymentWithdrawIdAsync(string merchantId, Guid formId)
+    {
+        var response = await _httpClient
+            .PostAsync($"/Services/Merchants/{merchantId}/FundOutStatus/{formId}", null)
+            .ConfigureAwait(false);
+
+        _logger.LogInformation($"Query Payment Withdraw Id StatusCode: {response.StatusCode}");
+
+        var data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+        _logger.LogInformation($"Query Payment Withdraw Id Body: {data}");
+
+        response.EnsureSuccessStatusCode();
+
+        using var sr = new StringReader(data);
+        var serializer = new XmlSerializer(typeof(QueryPaymentWithdrawFormResponse));
+        var withdrawResponse = (QueryPaymentWithdrawFormResponse)serializer.Deserialize(sr)!;
+
+        if (!string.IsNullOrWhiteSpace(withdrawResponse.WithdrawId))
+        {
+            return withdrawResponse.WithdrawId;
+        }
+
+        throw new ApiException($"Payment Withdraw Id should not be null or empty: {data}");
     }
 }

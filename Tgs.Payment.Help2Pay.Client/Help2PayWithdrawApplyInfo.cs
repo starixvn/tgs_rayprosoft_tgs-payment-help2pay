@@ -2,5 +2,5 @@
 {
     public record Help2PayWithdrawApplyInfo(
         Help2PayWithdrawSettings Settings,
-        Help2PayDepositResponse Response);
+        Help2PayWithdrawResponse Response);
 }

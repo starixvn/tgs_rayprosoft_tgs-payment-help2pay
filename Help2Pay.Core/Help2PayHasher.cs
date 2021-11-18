@@ -34,29 +34,6 @@ public class Help2PayHasher
         ["Status"] = 7
     };
 
-    //public string ComputeHash(string merchantCode, string securityCode, IDictionary<string, object> dict, string? ip)
-    //{
-    //    var content = string.Join(
-    //        "",
-    //        dict.OrderBy(p => _weight[p.Key])
-    //        .Select(p => p.Value switch
-    //        {
-    //            DateTimeOffset => $"{p.Value:yyyyMMddHHmmss}",
-    //            decimal => $"{p.Value:f2}",
-    //            _ => $"{p.Value ?? "null"}"
-    //        }));
-
-    //    var data = $"{merchantCode}{content}{securityCode}{ip}";
-
-    //    //var hash = string.Join(
-    //    //    "",
-    //    //    MD5.HashData(Encoding.UTF8.GetBytes(data)).Select(b => b.ToString("x2")));
-
-    //    var hash = new BigInteger(MD5.HashData(Encoding.UTF8.GetBytes(data)), isBigEndian: true).ToString("x");
-
-    //    return hash;
-    //}
-
     public string ComputeHash<T>(string merchantId, string securityCode, T data, string? ip = null)
     {
         var json = JsonSerializer.Serialize(data, _jsonSerializerOptions);
