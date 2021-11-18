@@ -2,9 +2,9 @@
 
 public record DepositOrder
 {
-    public string Currency { get; init; }
+    public string Currency { get; init; } = default!;
 
-    public string PlayerCode { get; init; }
+    public string PlayerCode { get; init; } = default!;
 
     public decimal Amount { get; init; }
 
@@ -12,9 +12,9 @@ public record DepositOrder
 
     public DateTime TransactionTime { get; init; }
 
-    public string ResponseUrl { get; init; }
+    public string ResponseUrl { get; init; } = default!;
 
-    public string CallbackUrl { get; init; }
+    public string CallbackUrl { get; init; } = default!;
 
-    public string BankCode { get; init; }
+    public string BankCode { get; init; } = default!;
 }

@@ -8,13 +8,12 @@ namespace Tgs.Payment.Help2Pay.MessageQueue;
 
 internal class DepositProcessor : IMessageProcessor
 {
-    private readonly ILogger<DepositProcessor> _logger;
-    private readonly Help2PayOptions _options;
-    private readonly Help2PaySerializer _help2PaySerializer;
+    private static readonly TimeSpan _TimeSpan = TimeSpan.FromHours(8);
     private readonly Help2PayDepositClient _help2PayDepositClient;
     private readonly Help2PayQueryClient _help2PayQueryClient;
-
-    private static readonly TimeSpan _TimeSpan = TimeSpan.FromHours(8);
+    private readonly Help2PaySerializer _help2PaySerializer;
+    private readonly ILogger<DepositProcessor> _logger;
+    private readonly Help2PayOptions _options;
 
     public DepositProcessor(
         ILogger<DepositProcessor> logger,
@@ -44,7 +43,7 @@ internal class DepositProcessor : IMessageProcessor
             TransactionId = settings.TransactionId,
             TransactionTime = DateTimeOffset.UtcNow.ToOffset(_TimeSpan).DateTime,
             ResponseUrl = settings.ResponseUrl,
-            CallbackUrl = $"{_options.CallbackBaseUrl}/api/deposit/callback"
+            CallbackUrl = $"{_options.CallbackBaseUrl}/deposit/callback"
         };
 
         var html = await _help2PayDepositClient

@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.Clients;
@@ -9,7 +8,7 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Payment.Help2Pay.Controllers;
 
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class DepositController : ControllerBase
 {
