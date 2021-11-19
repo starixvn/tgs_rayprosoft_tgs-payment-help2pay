@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Tgs.Payment.Help2Pay.Client\Tgs.Payment.Help2Pay.Client.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Configuration\" />
+  </ItemGroup>
+
 </Project>
