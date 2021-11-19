@@ -6,9 +6,8 @@ namespace Tgs.Payment.Help2Pay;
 
 internal class Help2PayDepositClient
 {
-    private readonly HttpClient _httpClient;
     private readonly Help2PayHasher _hasher;
-    private readonly ILogger<Help2PayDepositClient> _logger;
+    private readonly HttpClient _httpClient;
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
     {
@@ -20,6 +19,8 @@ internal class Help2PayDepositClient
         }
     };
 
+    private readonly ILogger<Help2PayDepositClient> _logger;
+
     public Help2PayDepositClient(
         HttpClient httpClient,
         Help2PayHasher hasher,
@@ -30,7 +31,7 @@ internal class Help2PayDepositClient
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async ValueTask<string> DepositAsync(string merchantId, string securityCode, DepositOrder order, string? ip)
+    public async ValueTask<string> DepositAsync(string merchantId, string securityCode, DepositOrder order)
     {
         var info = new DepositHasherInfo(
             order.PlayerCode,
@@ -39,7 +40,11 @@ internal class Help2PayDepositClient
             order.TransactionId,
             order.TransactionTime);
 
-        var hash = _hasher.ComputeHash(merchantId, securityCode, info, ip);
+        var hash = _hasher.ComputeHash(
+            merchantId,
+            securityCode,
+            info,
+            order.ClientIp);
 
         var request = new DepositRequestBody
         {
@@ -47,7 +52,7 @@ internal class Help2PayDepositClient
             Amount = order.Amount,
             Currency = order.Currency,
             PlayerCode = order.PlayerCode,
-            ClientIp = ip,
+            ClientIp = order.ClientIp,
             Hash = hash,
             ReferenceId = order.TransactionId,
             TransactionTime = order.TransactionTime,

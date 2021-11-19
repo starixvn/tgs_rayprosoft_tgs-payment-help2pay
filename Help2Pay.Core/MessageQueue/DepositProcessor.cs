@@ -43,15 +43,15 @@ internal class DepositProcessor : IMessageProcessor
             TransactionId = settings.TransactionId,
             TransactionTime = DateTimeOffset.UtcNow.ToOffset(_TimeSpan).DateTime,
             ResponseUrl = settings.ResponseUrl,
-            CallbackUrl = $"{_options.CallbackBaseUrl}/deposit/callback"
+            CallbackUrl = $"{_options.CallbackBaseUrl}/deposit/callback",
+            ClientIp = settings.ClientIp
         };
 
         var html = await _help2PayDepositClient
             .DepositAsync(
                 settings.MerchantId,
                 settings.SecurityCode,
-                order,
-                string.Empty)
+                order)
             .ConfigureAwait(false);
 
         var paymentDepositId = await _help2PayQueryClient

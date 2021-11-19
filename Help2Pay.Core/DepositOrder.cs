@@ -17,4 +17,6 @@ public record DepositOrder
     public string CallbackUrl { get; init; } = default!;
 
     public string BankCode { get; init; } = default!;
+
+    public string ClientIp { get; init; } = default!;
 }
