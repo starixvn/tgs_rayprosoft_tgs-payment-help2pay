@@ -9,7 +9,6 @@ namespace Tgs.Payment.Help2Pay.MessageQueue;
 
 internal class WithdrawProcessor : IMessageProcessor
 {
-    private static readonly TimeSpan _TimeSpan = TimeSpan.FromHours(8);
     private readonly Help2PayQueryClient _help2PayQueryClient;
     private readonly Help2PaySerializer _help2PaySerializer;
     private readonly Help2PayWithdrawClient _help2PayWithdrawClient;
@@ -45,7 +44,7 @@ internal class WithdrawProcessor : IMessageProcessor
             Currency = settings.Currency,
             BankCode = settings.BankCode,
             TransactionId = settings.TransactionId,
-            TransactionTime = DateTimeOffset.UtcNow.ToOffset(_TimeSpan).DateTime,
+            TransactionTime = DateTime.UtcNow,
             CallbackUrl = $"{_options.CallbackBaseUrl}/api/withdraw/callback",
             BackAccount = settings.BankAccount,
             BankAccountName = settings.BankAccountName,

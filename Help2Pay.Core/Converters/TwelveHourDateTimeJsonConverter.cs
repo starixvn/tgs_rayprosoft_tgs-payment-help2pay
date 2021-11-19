@@ -11,5 +11,5 @@ internal class TwelveHourDateTimeJsonConverter : JsonConverter<DateTime>
 
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         => writer.WriteStringValue(
-            value.ToString("yyyy-MM-dd hh:mm:sstt", CultureInfo.InvariantCulture));
+            new DateTimeOffset(value).ToOffset(TimeSpan.FromHours(8D)).DateTime.ToString("yyyy-MM-dd hh:mm:sstt", CultureInfo.InvariantCulture));
 }
