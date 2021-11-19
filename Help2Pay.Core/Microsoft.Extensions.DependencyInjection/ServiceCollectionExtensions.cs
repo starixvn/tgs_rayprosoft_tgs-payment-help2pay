@@ -3,13 +3,14 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.Help2Pay;
+using Tgs.Payment.Help2Pay.Configuration;
 using Tgs.Payment.Help2Pay.MessageQueue;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddHelp2Pay(this IServiceCollection services, Action<Help2PayOptions, IServiceProvider> configure)
+    public static Help2PayConfiguration AddHelp2Pay(this IServiceCollection services, Action<Help2PayOptions, IServiceProvider> configure)
     {
         services
             .AddOptions<Help2PayOptions>()
@@ -73,6 +74,8 @@ public static class ServiceCollectionExtensions
             })
             .AddPaymentClient();
 
-        return services;
+        var configuration = new Help2PayConfiguration(services);
+
+        return configuration;
     }
 }

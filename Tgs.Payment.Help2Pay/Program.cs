@@ -14,6 +14,12 @@ builder.Services
 
         var jsonOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value;
         options.SystemSerializerOptions = jsonOptions.JsonSerializerOptions;
+    })
+    .UseRedis((options, sp) =>
+    {
+        var config = sp.GetRequiredService<IConfiguration>();
+
+        options.ConnectionString = config.GetConnectionString("Redis");
     });
 
 builder.Services.AddControllers()

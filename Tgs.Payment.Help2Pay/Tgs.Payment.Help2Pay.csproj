@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Help2Pay.Core\Help2Pay.Core.csproj" />
+    <ProjectReference Include="..\Tgs.Payment.Help2Pay.Repository\Tgs.Payment.Help2Pay.Repository.csproj" />
   </ItemGroup>
 
 </Project>
