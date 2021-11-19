@@ -48,7 +48,8 @@ internal class WithdrawProcessor : IMessageProcessor
             TransactionTime = DateTimeOffset.UtcNow.ToOffset(_TimeSpan).DateTime,
             CallbackUrl = $"{_options.CallbackBaseUrl}/api/withdraw/callback",
             BackAccount = settings.BankAccount,
-            BankAccountName = settings.BankAccountName
+            BankAccountName = settings.BankAccountName,
+            ClientIp = "127.0.0.1"
         };
 
         var withdrawResponse = await _help2PayWithdrawClient.WithdrawAsync(settings.MerchantId, settings.SecurityCode, order)

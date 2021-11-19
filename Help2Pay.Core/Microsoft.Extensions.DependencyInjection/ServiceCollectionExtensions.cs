@@ -27,13 +27,13 @@ public static class ServiceCollectionExtensions
                         var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
                         options.Url = help2PayOptions.NatsUrl;
                     })
-                    .AddProcessor<DepositProcessor>("tgs.payment.help2pay.deposit", "tgs.payment.help2pay.deposit");
+                    .AddProcessor<DepositProcessor>("tgs.payment.help2pay.deposit", "tgs.payment.help2pay.deposit")
+                    .AddProcessor<WithdrawProcessor>("tgs.payment.help2pay.withdraw", "tgs.payment.help2pay.withdraw");
             })
             .AddNatsGlobPatternExchange("*");
 
         services
-            .AddHttpClient<Help2PayDepositClient>()
-            .ConfigureHttpClient((sp, httpClient)
+            .AddHttpClient<Help2PayDepositClient>((sp, httpClient)
             =>
             {
                 var options = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
@@ -41,12 +41,19 @@ public static class ServiceCollectionExtensions
             });
 
         services
-            .AddHttpClient<Help2PayQueryClient>()
-            .ConfigureHttpClient((sp, httpClient)
+            .AddHttpClient<Help2PayQueryClient>((sp, httpClient)
             =>
             {
                 var options = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
                 httpClient.BaseAddress = options.PaymentQueryApiUrl;
+            });
+
+        services
+            .AddHttpClient<Help2PayWithdrawClient>((sp, httpClient)
+            =>
+            {
+                var options = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
+                httpClient.BaseAddress = options.PaymentWithdrawApiUrl;
             });
 
         services

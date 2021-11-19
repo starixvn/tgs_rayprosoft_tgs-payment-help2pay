@@ -12,7 +12,9 @@ public class Help2PayOptions
 
     public Uri PaymentQueryApiUrl { get; set; } = default!;
 
-    public JsonSerializerOptions? SystemSerializerOptions { get; set; }
-
     public Uri PaymentServiceBaseUrl { get; set; } = default!;
+
+    public Uri PaymentWithdrawApiUrl { get; set; } = default!;
+
+    public JsonSerializerOptions? SystemSerializerOptions { get; set; }
 }

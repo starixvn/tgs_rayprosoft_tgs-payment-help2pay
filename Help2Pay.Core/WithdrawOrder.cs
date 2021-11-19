@@ -2,21 +2,23 @@
 
 public record WithdrawOrder
 {
-    public string Currency { get; init; }
+    public decimal Amount { get; init; } = default!;
 
-    public string PlayerCode { get; init; }
+    public string BackAccount { get; init; } = default!;
 
-    public decimal Amount { get; init; }
+    public string BankAccountName { get; init; } = default!;
 
-    public Guid TransactionId { get; init; }
+    public string BankCode { get; init; } = default!;
 
-    public DateTime TransactionTime { get; init; }
+    public string CallbackUrl { get; init; } = default!;
 
-    public string CallbackUrl { get; init; }
+    public string ClientIp { get; init; } = default!;
 
-    public string BankCode { get; init; }
+    public string Currency { get; init; } = default!;
 
-    public string BackAccount { get; init; }
+    public string PlayerCode { get; init; } = default!;
 
-    public string BankAccountName { get; init; }
+    public Guid TransactionId { get; init; } = default!;
+
+    public DateTime TransactionTime { get; init; } = default!;
 }

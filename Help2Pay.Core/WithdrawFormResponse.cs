@@ -3,7 +3,7 @@
 namespace Tgs.Payment.Help2Pay;
 
 [XmlRoot(ElementName = "Payout")]
-public record CreateWithdrawFormResponse
+public record WithdrawFormResponse
 {
     [XmlElement(ElementName = "statusCode")]
     public string StatusCode { get; init; }
