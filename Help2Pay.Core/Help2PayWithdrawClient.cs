@@ -21,14 +21,17 @@ internal class Help2PayWithdrawClient
     };
 
     private readonly ILogger<Help2PayWithdrawClient> _logger;
+    private readonly IWithdrawDataStore _store;
 
     public Help2PayWithdrawClient(
         HttpClient httpClient,
         Help2PayHasher hasher,
+        IWithdrawDataStore store,
         ILogger<Help2PayWithdrawClient> logger)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         _hasher = hasher ?? throw new ArgumentNullException(nameof(hasher));
+        _store = store ?? throw new ArgumentNullException(nameof(store));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -43,6 +46,8 @@ internal class Help2PayWithdrawClient
             order.BackAccount);
 
         var hash = _hasher.ComputeHash(merchantId, securityCode, info);
+
+        await _store.StoreHashAsync(order.TransactionId, hash).ConfigureAwait(false);
 
         var request = new WithdrawRequestBody
         {
