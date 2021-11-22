@@ -11,7 +11,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
     <PackageReference Include="Tgs.MessageQueue.Nats" Version="1.1.1" />
     <PackageReference Include="Tgs.Payment.Client" Version="0.2.1" />
-    <PackageReference Include="Tgs.PaymentService.Client" Version="0.0.38-alpha" />
+    <PackageReference Include="Tgs.PaymentService.Client" Version="0.0.39" />
     <PackageReference Include="TGS.ServiceUtility" Version="0.1.0" />
   </ItemGroup>
 
