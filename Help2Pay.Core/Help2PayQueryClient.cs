@@ -39,12 +39,12 @@ internal class Help2PayQueryClient
         var serializer = new XmlSerializer(typeof(QueryPaymentDespositFormResponse));
         var depositResponse = (QueryPaymentDespositFormResponse)serializer.Deserialize(sr)!;
 
-        if (!string.IsNullOrWhiteSpace(depositResponse.DepositId))
+        if (string.IsNullOrWhiteSpace(depositResponse.DepositId) || depositResponse.DepositId == "0")
         {
-            return depositResponse.DepositId;
+            throw new ApiException($"Invalid Payment Deposit Id.");
         }
 
-        throw new ApiException($"Payment Deposit Id should not be null or empty: {data}");
+        return depositResponse.DepositId;
     }
 
     public async ValueTask<string> QueryPaymentWithdrawIdAsync(string merchantId, Guid formId)
@@ -65,11 +65,11 @@ internal class Help2PayQueryClient
         var serializer = new XmlSerializer(typeof(QueryPaymentWithdrawFormResponse));
         var withdrawResponse = (QueryPaymentWithdrawFormResponse)serializer.Deserialize(sr)!;
 
-        if (!string.IsNullOrWhiteSpace(withdrawResponse.WithdrawId))
+        if (string.IsNullOrWhiteSpace(withdrawResponse.WithdrawId) || withdrawResponse.WithdrawId == "0")
         {
-            return withdrawResponse.WithdrawId;
+            throw new ApiException($"Invalid Payment Withdraw Id.");
         }
 
-        throw new ApiException($"Payment Withdraw Id should not be null or empty: {data}");
+        return withdrawResponse.WithdrawId;
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.Clients;
@@ -14,34 +13,31 @@ namespace Tgs.Payment.Help2Pay.Controllers;
 public class WithdrawController : ControllerBase
 {
     private readonly ILogger<WithdrawController> _logger;
-    private readonly IWithdrawDataStore _store;
 
     public WithdrawController(
-        ILogger<WithdrawController> logger,
-        IWithdrawDataStore store
-        )
+        ILogger<WithdrawController> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _store = store ?? throw new ArgumentNullException(nameof(store));
     }
 
     [HttpPost("validate")]
     public async ValueTask<string> ValidateWithdrawFormAsync(
         [FromQuery(Name = "transId")] Guid formId,
         [FromQuery(Name = "key")] string? hash,
-        [FromServices] IGetService<GetWithdrawFormQuery, WithdrawFormInfo?> getWithdrawFormService)
+        [FromServices] IGetService<GetWithdrawFormQuery, WithdrawFormInfo?> getWithdrawFormService,
+        [FromServices] IWithdrawDataStore store)
     {
         _logger.LogInformation($"transId='{formId}', hash={hash}");
 
-        var storedHash = await _store.GetHashAsync(formId).ConfigureAwait(false);
-
-        _logger.LogInformation($"withdraw form id='{formId}', storedHash={storedHash}");
+        var storedHash = await store.GetHashAsync(formId).ConfigureAwait(false);
 
         if (string.IsNullOrEmpty(storedHash))
         {
             _logger.LogError($"withdraw form id='{formId}', stored hash is null or empty");
             return "false";
         }
+
+        _logger.LogInformation($"withdraw form id='{formId}', storedHash={storedHash}");
 
         if (!storedHash.Equals(hash, StringComparison.OrdinalIgnoreCase))
         {
@@ -67,11 +63,16 @@ public class WithdrawController : ControllerBase
         [FromServices] IGetService<GetWithdrawFormQuery, WithdrawFormInfo?> getWithdrawFormService,
         [FromServices] IGetService<VerifyWithdrawConfirmHashCommand, bool> verifyHashCommandService,
         [FromServices] ICommandService<SaveWithdrawReturnCommand> saveReturnService,
-        [FromForm] WithdrawConfirmViewModel withdrawModel)
+        [FromForm] IFormCollection formData)
     {
         var jsonSerializerOptions = options.Value.SystemSerializerOptions;
-        var data = JsonSerializer.Serialize(withdrawModel, jsonSerializerOptions);
+
+        var dict = formData.ToDictionary(x => x.Key, x => x.Value.ToString());
+        var data = JsonSerializer.Serialize(dict, jsonSerializerOptions);
+
         _logger.LogInformation($"withdraw callback: {data}");
+
+        var withdrawModel = JsonSerializer.Deserialize<WithdrawConfirmViewModel>(data, jsonSerializerOptions)!;
 
         var withdrawForm = await getWithdrawFormService
                .GetAsync(new GetWithdrawFormQuery(withdrawModel.TransactionId))

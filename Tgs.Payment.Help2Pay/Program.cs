@@ -27,6 +27,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
     });
 
 builder.Logging.AddTgsLog();

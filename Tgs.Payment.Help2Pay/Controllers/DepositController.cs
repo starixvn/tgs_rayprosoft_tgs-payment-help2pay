@@ -27,11 +27,16 @@ public class DepositController : ControllerBase
         [FromServices] IGetService<VerifyDepositConfirmHashCommand, bool> verifyHashCommandService,
         [FromServices] ICommandService<SaveDepositReturnCommand> saveReturnService,
         [FromServices] ICommandService<ApproveDepositFormCommand> approveService,
-        [FromForm] DepositConfirmViewModel depositModel)
+        [FromForm] IFormCollection formData)
     {
         var jsonSerializerOptions = options.Value.SystemSerializerOptions;
-        var data = JsonSerializer.Serialize(depositModel, jsonSerializerOptions);
+
+        var dict = formData.ToDictionary(x => x.Key, x => x.Value.ToString());
+        var data = JsonSerializer.Serialize(dict, jsonSerializerOptions);
+
         _logger.LogInformation($"deposit callback: {data}");
+
+        var depositModel = JsonSerializer.Deserialize<DepositConfirmViewModel>(data, jsonSerializerOptions)!;
 
         var depositForm = await getDepositFormService
             .GetAsync(new GetDepositFormQuery(depositModel.ReferenceId))

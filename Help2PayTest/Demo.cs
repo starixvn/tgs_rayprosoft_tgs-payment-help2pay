@@ -26,11 +26,9 @@ internal class Demo : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        //await DepositAsync().ConfigureAwait(false);
+        await DepositAsync().ConfigureAwait(false);
 
-        //await QueryDepositFormAsync().ConfigureAwait(false);
-
-        await WithdrawAsync().ConfigureAwait(false);
+        //await WithdrawAsync().ConfigureAwait(false);
     }
 
     private async Task DepositAsync()
@@ -52,36 +50,6 @@ internal class Demo : BackgroundService
             .ConfigureAwait(false);
 
         Console.WriteLine(paymentReturn);
-    }
-
-    private async Task QueryDepositFormAsync()
-    {
-        var merchant = "INT0492";
-        var referenceId = Guid.Parse("d2077f92-b074-4ca4-a4f8-09cedf5b82aa");
-
-        var url = $"https://query.testingzone88.com/Services/Merchants/{merchant}/TransferStatus/{referenceId}";
-
-        using var httpClient = new HttpClient();
-
-        var response = await httpClient.PostAsync(url, null).ConfigureAwait(false);
-
-        var value = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-        Console.WriteLine("status code: {0}", response.StatusCode);
-        Console.WriteLine("data: {0}", value);
-
-        try
-        {
-            using var sr = new StringReader(value);
-            var serializer = new XmlSerializer(typeof(WithdrawResponse));
-            var model = serializer.Deserialize(sr);
-
-            Console.WriteLine(JsonSerializer.Serialize(model));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, string.Empty);
-        }
     }
 
     private async Task WithdrawAsync()

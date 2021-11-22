@@ -1,45 +1,45 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json.Serialization;
 
 namespace Tgs.Payment.Help2Pay.ViewModels;
 
 public class DepositConfirmViewModel
 {
-    [FromForm(Name = "Amount")]
+    [JsonPropertyName("Amount")]
     public decimal Amount { get; init; } = default!;
 
-    [FromForm(Name = "Currency")]
+    [JsonPropertyName("Currency")]
     public string Currency { get; init; } = default!;
 
-    [FromForm(Name = "DepositFee")]
+    [JsonPropertyName("DepositFee")]
     public decimal DepositFee { get; init; } = default!;
 
-    [FromForm(Name = "ID")]
+    [JsonPropertyName("ID")]
     public string DepositId { get; init; } = default!;
 
-    [FromForm(Name = "ErrorCode")]
+    [JsonPropertyName("ErrorCode")]
     public string? ErrorCode { get; init; } = default!;
 
-    [FromForm(Name = "Key")]
+    [JsonPropertyName("Key")]
     public string Hash { get; init; } = default!;
 
-    [FromForm(Name = "Merchant")]
+    [JsonPropertyName("Merchant")]
     public string MerchantId { get; init; } = default!;
 
-    [FromForm(Name = "Note")]
+    [JsonPropertyName("Note")]
     public string? Note { get; init; }
 
-    [FromForm(Name = "Customer")]
+    [JsonPropertyName("Customer")]
     public string PlayerCode { get; init; } = default!;
 
-    [FromForm(Name = "Reference")]
+    [JsonPropertyName("Reference")]
     public Guid ReferenceId { get; init; } = default!;
 
-    [FromForm(Name = "StatementDate")]
+    [JsonPropertyName("StatementDate")]
     public string StatementTime { get; init; } = default!;
 
-    [FromForm(Name = "Status")]
+    [JsonPropertyName("Status")]
     public string Status { get; init; } = default!;
 
-    [FromForm(Name = "Datetime")]
+    [JsonPropertyName("Datetime")]
     public string TransactionTime { get; init; } = default!;
 }
