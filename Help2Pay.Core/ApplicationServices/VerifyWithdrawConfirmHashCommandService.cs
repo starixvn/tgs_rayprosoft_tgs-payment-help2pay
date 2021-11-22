@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.Help2Pay.Services;
+namespace Tgs.Payment.Help2Pay.ApplicationServices;
 
 internal class VerifyWithdrawConfirmHashCommandService : IGetService<VerifyWithdrawConfirmHashCommand, bool>
 {

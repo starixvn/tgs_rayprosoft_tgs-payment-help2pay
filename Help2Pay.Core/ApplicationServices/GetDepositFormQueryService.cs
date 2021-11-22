@@ -2,13 +2,13 @@
 using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.Help2Pay.Services;
+namespace Tgs.Payment.Help2Pay.ApplicationServices;
 
 internal class GetDepositFormQueryService : IGetService<GetDepositFormQuery, DepositFormInfo?>
 {
+    private readonly Help2PaySerializer _help2PaySerializer;
     private readonly ILogger<GetDepositFormQueryService> _logger;
     private readonly IPaymentServiceClient _paymentServiceClient;
-    private readonly Help2PaySerializer _help2PaySerializer;
 
     public GetDepositFormQueryService(
         ILogger<GetDepositFormQueryService> logger,

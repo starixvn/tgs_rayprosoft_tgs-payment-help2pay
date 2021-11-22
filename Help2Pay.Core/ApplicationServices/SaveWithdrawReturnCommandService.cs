@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.Help2Pay.Services;
+namespace Tgs.Payment.Help2Pay.ApplicationServices;
 
 internal class SaveWithdrawReturnCommandService : ICommandService<SaveWithdrawReturnCommand>
 {

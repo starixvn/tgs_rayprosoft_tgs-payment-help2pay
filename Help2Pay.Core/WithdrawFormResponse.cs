@@ -6,8 +6,8 @@ namespace Tgs.Payment.Help2Pay;
 public record WithdrawFormResponse
 {
     [XmlElement(ElementName = "statusCode")]
-    public string StatusCode { get; init; }
+    public string StatusCode { get; init; } = default!;
 
     [XmlElement(ElementName = "message")]
-    public string Message { get; init; }
+    public string Message { get; init; } = default!;
 }

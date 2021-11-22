@@ -1,7 +1,7 @@
 ﻿using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.Help2Pay.Services;
+namespace Tgs.Payment.Help2Pay.ApplicationServices;
 
 internal class ApproveDepositFormCommandService : ICommandService<ApproveDepositFormCommand>
 {
@@ -14,5 +14,8 @@ internal class ApproveDepositFormCommandService : ICommandService<ApproveDeposit
     }
 
     public ValueTask ExecuteAsync(ApproveDepositFormCommand command, CancellationToken cancellationToken = default)
-        => _paymentClient.ApproveDepositAsync(command.FormId, command.BrandId, command.ActualAmount);
+        => _paymentClient.ApproveDepositAsync(
+                command.FormId,
+                command.BrandId,
+                command.ActualAmount);
 }

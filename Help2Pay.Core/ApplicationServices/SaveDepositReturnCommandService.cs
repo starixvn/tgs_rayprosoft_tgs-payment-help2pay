@@ -1,12 +1,12 @@
 ﻿using Tgs.Payment.Clients;
 using Tgs.ServiceUtility;
 
-namespace Tgs.Payment.Help2Pay.Services;
+namespace Tgs.Payment.Help2Pay.ApplicationServices;
 
 internal class SaveDepositReturnCommandService : ICommandService<SaveDepositReturnCommand>
 {
-    private readonly IPaymentServiceClient _paymentServiceClient;
     private readonly Help2PaySerializer _help2PaySerializer;
+    private readonly IPaymentServiceClient _paymentServiceClient;
 
     public SaveDepositReturnCommandService(
         IPaymentServiceClient paymentServiceClient,

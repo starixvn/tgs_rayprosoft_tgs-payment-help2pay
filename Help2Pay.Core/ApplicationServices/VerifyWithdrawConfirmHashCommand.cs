@@ -1,11 +1,11 @@
-﻿namespace Tgs.Payment.Help2Pay.Services;
+﻿namespace Tgs.Payment.Help2Pay.ApplicationServices;
 
-public record VerifyDepositConfirmHashCommand(
+public record VerifyWithdrawConfirmHashCommand(
     string MerchantId,
     string SecurityCode,
     string PlayerCode,
     string Currency,
     decimal Amount,
-    Guid ReferenceId,
+    Guid TransactionId,
     string StatusCode,
     string HashKey);

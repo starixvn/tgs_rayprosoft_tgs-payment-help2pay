@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.Clients;
-using Tgs.Payment.Help2Pay.Services;
+using Tgs.Payment.Help2Pay.ApplicationServices;
 using Tgs.Payment.Help2Pay.ViewModels;
 using Tgs.ServiceUtility;
 
