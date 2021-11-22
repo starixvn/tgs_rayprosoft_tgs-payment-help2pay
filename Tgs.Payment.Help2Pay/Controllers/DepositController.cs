@@ -24,20 +24,20 @@ public class DepositController : ControllerBase
     public async Task<IActionResult> DepositCallbackAsync(
         [FromServices] IOptions<Help2PayOptions> options,
         [FromServices] IGetService<GetDepositFormQuery, DepositFormInfo?> getDepositFormService,
-        [FromServices] IGetService<VerifyHashCommand, bool> verifyHashCommandService,
+        [FromServices] IGetService<VerifyDepositConfirmHashCommand, bool> verifyHashCommandService,
         [FromServices] ICommandService<SaveDepositReturnCommand> saveReturnService,
         [FromServices] ICommandService<ApproveDepositFormCommand> approveService,
-        [FromForm] DepositComfirmViewModel depositModel)
+        [FromForm] DepositConfirmViewModel depositModel)
     {
         var jsonSerializerOptions = options.Value.SystemSerializerOptions;
         var data = JsonSerializer.Serialize(depositModel, jsonSerializerOptions);
-        _logger.LogInformation($"callback: {data}");
+        _logger.LogInformation($"deposit callback: {data}");
 
         var depositForm = await getDepositFormService
             .GetAsync(new GetDepositFormQuery(depositModel.ReferenceId))
             .ConfigureAwait(false);
 
-        var verifyHashCommand = new VerifyHashCommand(
+        var verifyHashCommand = new VerifyDepositConfirmHashCommand(
                 depositModel.MerchantId,
                 depositForm!.ApplyInfo!.Settings.SecurityCode,
                 depositModel.PlayerCode,
@@ -59,8 +59,10 @@ public class DepositController : ControllerBase
         if (depositForm.Status < PaymentFlowState.WaitApprove)
         {
             var paymentReturn = new Help2PayDepositReturn(
+                    depositModel.MerchantId,
                     depositModel.DepositId,
                     depositModel.PlayerCode,
+                    depositModel.Currency,
                     depositModel.ReferenceId,
                     depositModel.Amount,
                     depositModel.DepositFee,

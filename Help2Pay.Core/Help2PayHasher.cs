@@ -23,6 +23,7 @@ public class Help2PayHasher
     {
         ["Reference"] = 1,
         ["TransactionID"] = 1,
+        ["TransactionId"] = 1,
         ["Customer"] = 2,
         ["MemberCode"] = 2,
         ["Amount"] = 3,
