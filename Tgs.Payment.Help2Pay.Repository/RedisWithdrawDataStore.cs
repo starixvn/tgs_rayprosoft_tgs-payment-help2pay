@@ -8,7 +8,7 @@ internal class RedisWithdrawDataStore : IWithdrawDataStore
 
     private static readonly string _KeyPrefix = "Help2Pay:WithdrawHash";
 
-    private IDatabase _redisDatabase;
+    private readonly IDatabase _redisDatabase;
 
     public RedisWithdrawDataStore(
         RedisConnectionFactory redisConnectionFactory)
