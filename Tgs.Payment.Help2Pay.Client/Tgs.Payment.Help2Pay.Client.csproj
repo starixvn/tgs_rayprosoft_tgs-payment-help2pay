@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <RootNamespace>Tgs.Payment.Help2Pay</RootNamespace>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageId>Tgs.Payment.Help2Pay.Client</PackageId>
     <PackageTags>tgs payment</PackageTags>
-    <Version>0.0.1-alpha</Version>
+    <Version>0.0.4</Version>
     <Authors>Raypro</Authors>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
