@@ -44,13 +44,14 @@ public class HasherTests
         var currency = "PHP";
         var referenceId = Guid.NewGuid();
         var customer = referenceId.ToString();
-        var now = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8)).DateTime;
+        var now = DateTime.UtcNow;
         var amount = 71m;
         var ip = "127.0.0.1";
 
         var info = new DepositHasherInfo(customer, currency, amount, referenceId, now);
 
-        var data = $"{merchant}{referenceId}{customer}{amount:f2}{currency}{now:yyyyMMddHHmmss}{securityCode}{ip}";
+        var timeConverted = new DateTimeOffset(now).ToOffset(TimeSpan.FromHours(8D)).DateTime.ToString("yyyyMMddHHmmss");
+        var data = $"{merchant}{referenceId}{customer}{amount:f2}{currency}{timeConverted}{securityCode}{ip}";
         var expected = HashCode(data);
 
         var actual = sut.ComputeHash(merchant, securityCode, info, ip);
@@ -94,7 +95,7 @@ public class HasherTests
         var currency = "PHP";
         var transactionId = Guid.NewGuid();
         var memberCode = transactionId.ToString();
-        var now = DateTimeOffset.Now.ToOffset(TimeSpan.FromHours(8)).DateTime;
+        var now = DateTime.UtcNow;
         var amount = 71m;
         var bankAccount = "bank_account";
 
@@ -108,7 +109,8 @@ public class HasherTests
             TransactionTime = now
         };
 
-        var data = $"{merchant}{transactionId}{memberCode}{amount:f2}{currency}{now:yyyyMMddHHmmss}{bankAccount}{securityCode}";
+        var timeConverted = new DateTimeOffset(now).ToOffset(TimeSpan.FromHours(8D)).DateTime.ToString("yyyyMMddHHmmss");
+        var data = $"{merchant}{transactionId}{memberCode}{amount:f2}{currency}{timeConverted}{bankAccount}{securityCode}";
         var expected = HashCode(data);
 
         var actual = sut.ComputeHash(merchant, securityCode, info);
