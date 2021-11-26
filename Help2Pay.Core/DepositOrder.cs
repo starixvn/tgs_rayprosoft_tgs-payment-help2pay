@@ -4,7 +4,7 @@ public record DepositOrder
 {
     public string Currency { get; init; } = default!;
 
-    public string PlayerCode { get; init; } = default!;
+    public string Customer { get; init; } = default!;
 
     public decimal Amount { get; init; }
 

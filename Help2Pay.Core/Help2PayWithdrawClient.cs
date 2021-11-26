@@ -37,28 +37,30 @@ internal class Help2PayWithdrawClient
 
     public async ValueTask<WithdrawFormResponse> WithdrawAsync(string merchantId, string securityCode, WithdrawOrder order)
     {
-        var info = new WithdrawHasherInfo(
-            order.PlayerCode,
-            order.Currency,
-            order.Amount,
-            order.TransactionId,
-            order.TransactionTime,
-            order.BackAccount);
+        var info = new WithdrawHasherInfo
+        {
+            MemberCode = order.MemberCode,
+            CurrencyCode = order.Currency,
+            Amount = order.Amount,
+            TransactionId = order.TransactionId,
+            TransactionTime = order.TransactionTime,
+            BankAccount = order.BankAccount
+        };
 
         var hash = _hasher.ComputeHash(merchantId, securityCode, info);
 
-        await _store.StoreHashAsync(order.TransactionId, hash).ConfigureAwait(false);
+        await _store.StoreHashAsync(hash, order.TransactionId).ConfigureAwait(false);
 
         var request = new WithdrawRequestBody
         {
             MerchantId = merchantId,
             Amount = order.Amount,
-            BankAccount = order.BackAccount,
+            BankAccount = order.BankAccount,
             BankAccountName = order.BankAccountName,
             BankCode = order.BankCode,
             Currency = order.Currency,
             TransactionId = order.TransactionId,
-            PlayerCode = order.PlayerCode,
+            MemberCode = order.MemberCode,
             TransactionTime = order.TransactionTime,
             ClientIp = order.ClientIp,
             CallbackUrl = order.CallbackUrl,
@@ -87,6 +89,9 @@ internal class Help2PayWithdrawClient
     private IEnumerable<KeyValuePair<string, string>> SerializeToFormParameters<T>(T data)
     {
         var json = JsonSerializer.Serialize(data, _jsonSerializerOptions);
+
+        _logger.LogInformation($"Withdraw output parameters: {json}");
+
         return JsonSerializer.Deserialize<Dictionary<string, string>>(json)!;
     }
 }

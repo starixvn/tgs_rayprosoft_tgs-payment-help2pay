@@ -26,16 +26,15 @@ internal class Demo : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await DepositAsync().ConfigureAwait(false);
+        //await DepositAsync().ConfigureAwait(false);
 
-        //await WithdrawAsync().ConfigureAwait(false);
+        await WithdrawAsync().ConfigureAwait(false);
     }
 
     private async Task DepositAsync()
     {
         var settings = new Help2PayDepositSettings(
                         "INT0492",
-                        "4ucmqplxb029",
                         "juJFlG7Jo3yrdeK1Dmeg",
                         "PHP",
                         "BDO",
@@ -56,7 +55,6 @@ internal class Demo : BackgroundService
     {
         var settings = new Help2PayWithdrawSettings(
                        "INT0492",
-                       "4ucmqplxb029",
                        "juJFlG7Jo3yrdeK1Dmeg",
                        Guid.NewGuid(),
                        "PHP",

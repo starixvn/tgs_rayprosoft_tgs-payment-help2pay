@@ -27,20 +27,19 @@ public class WithdrawController : ControllerBase
         [FromServices] IGetService<GetWithdrawFormQuery, WithdrawFormInfo?> getWithdrawFormService,
         [FromServices] IWithdrawDataStore store)
     {
-        _logger.LogInformation($"transId='{formId}', hash={hash}");
+        _logger.LogInformation($"Withdraw validation input: transId='{formId}', hash={hash}");
 
-        var storedHash = await store.GetHashAsync(formId).ConfigureAwait(false);
-
-        if (string.IsNullOrEmpty(storedHash))
+        if (string.IsNullOrEmpty(hash))
         {
-            _logger.LogError($"withdraw form id='{formId}', stored hash is null or empty");
+            _logger.LogError($"Withdraw form id='{formId}', input hash is null or empty");
             return "false";
         }
 
-        _logger.LogInformation($"withdraw form id='{formId}', storedHash={storedHash}");
+        var storedFormId = await store.GetHashAsync(hash!).ConfigureAwait(false);
 
-        if (!storedHash.Equals(hash, StringComparison.OrdinalIgnoreCase))
+        if (storedFormId == null || storedFormId.Value != formId)
         {
+            _logger.LogError($"Withdraw validataion input form id='{formId}' is not matched as expected form id='{storedFormId}'");
             return "false";
         }
 
@@ -48,9 +47,9 @@ public class WithdrawController : ControllerBase
             .GetAsync(new GetWithdrawFormQuery(formId))
             .ConfigureAwait(false);
 
-        if (info!.Status != PaymentFlowState.Approved)
+        if (info!.Status == PaymentFlowState.Paid)
         {
-            _logger.LogError($"withdraw form with id='{formId}' is not at Approved status. status={(int)info.Status}");
+            _logger.LogError($"Withdraw form with id='{formId}' is paid already");
             return "false";
         }
 
@@ -70,7 +69,7 @@ public class WithdrawController : ControllerBase
         var dict = formData.ToDictionary(x => x.Key, x => x.Value.ToString());
         var data = JsonSerializer.Serialize(dict, jsonSerializerOptions);
 
-        _logger.LogInformation($"withdraw callback: {data}");
+        _logger.LogInformation($"Withdraw callback: {data}");
 
         var withdrawModel = JsonSerializer.Deserialize<WithdrawConfirmViewModel>(data, jsonSerializerOptions)!;
 

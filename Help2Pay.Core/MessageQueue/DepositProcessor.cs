@@ -35,10 +35,10 @@ internal class DepositProcessor : IMessageProcessor
 
         var order = new DepositOrder
         {
-            PlayerCode = settings.PlayerCode,
             Amount = decimal.Parse(request.Amount),
             Currency = settings.Currency,
             BankCode = settings.BankCode,
+            Customer = settings.TransactionId.ToString(),
             TransactionId = settings.TransactionId,
             TransactionTime = DateTime.UtcNow,
             ResponseUrl = settings.ResponseUrl,

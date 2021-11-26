@@ -19,6 +19,9 @@ internal class DepositRequestBody
     [JsonPropertyName("Currency")]
     public string Currency { get; init; } = default!;
 
+    [JsonPropertyName("Customer")]
+    public string Customer { get; init; } = default!;
+
     [JsonPropertyName("Key")]
     public string Hash { get; init; } = default!;
 
@@ -27,9 +30,6 @@ internal class DepositRequestBody
 
     [JsonPropertyName("Merchant")]
     public string MerchantId { get; init; } = default!;
-
-    [JsonPropertyName("Customer")]
-    public string PlayerCode { get; init; } = default!;
 
     [JsonPropertyName("Reference")]
     public Guid ReferenceId { get; init; }

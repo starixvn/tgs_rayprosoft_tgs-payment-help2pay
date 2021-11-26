@@ -21,21 +21,21 @@ internal class RedisWithdrawDataStore : IWithdrawDataStore
         _redisDatabase = redisConnectionFactory.Database;
     }
 
-    public async ValueTask<string?> GetHashAsync(Guid formId)
+    public async ValueTask<Guid?> GetHashAsync(string hash)
     {
-        var dataKey = $"{_KeyPrefix}:{formId}";
+        var dataKey = $"{_KeyPrefix}:{hash}";
 
         var value = await _redisDatabase.StringGetAsync(dataKey)
             .ConfigureAwait(false);
 
-        return value;
+        return value.IsNullOrEmpty ? null : Guid.Parse(value);
     }
 
-    public async ValueTask<bool> StoreHashAsync(Guid formId, string hash)
+    public async ValueTask<bool> StoreHashAsync(string hash, Guid formId)
     {
-        var dataKey = $"{_KeyPrefix}:{formId}";
+        var dataKey = $"{_KeyPrefix}:{hash}";
 
-        return await _redisDatabase.StringSetAsync(dataKey, hash, _Expire, When.NotExists)
+        return await _redisDatabase.StringSetAsync(dataKey, formId.ToString(), _Expire, When.NotExists)
             .ConfigureAwait(false);
     }
 }

@@ -2,7 +2,7 @@
 
 public interface IWithdrawDataStore
 {
-    ValueTask<string?> GetHashAsync(Guid formId);
+    ValueTask<Guid?> GetHashAsync(string hash);
 
-    ValueTask<bool> StoreHashAsync(Guid formId, string hash);
+    ValueTask<bool> StoreHashAsync(string hash, Guid formId);
 }

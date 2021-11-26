@@ -46,14 +46,14 @@ public class Help2PayWithdrawClientTests
 
         var order = new WithdrawOrder
         {
-            PlayerCode = "playerCode",
+            MemberCode = "playerCode",
             Amount = 100m,
             Currency = "PHP",
             BankCode = "BDO",
             TransactionId = Guid.NewGuid(),
             TransactionTime = DateTime.UtcNow,
             CallbackUrl = $"http://www.google.com",
-            BackAccount = "0012212345697",
+            BankAccount = "0012212345697",
             BankAccountName = "steve",
             ClientIp = "127.0.0.1"
         };
@@ -64,7 +64,7 @@ public class Help2PayWithdrawClientTests
 
         mockWithdrawStore.Verify(fake
            =>
-           fake.StoreHashAsync(It.Is<Guid>(x => x == order.TransactionId), It.IsAny<string>()),
+           fake.StoreHashAsync(It.IsAny<string>(), It.Is<Guid>(x => x == order.TransactionId)),
            Times.Exactly(1));
     }
 }

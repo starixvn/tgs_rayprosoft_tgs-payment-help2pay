@@ -34,7 +34,7 @@ internal class Help2PayDepositClient
     public async ValueTask<string> DepositAsync(string merchantId, string securityCode, DepositOrder order)
     {
         var info = new DepositHasherInfo(
-            order.PlayerCode,
+            order.Customer,
             order.Currency,
             order.Amount,
             order.TransactionId,
@@ -51,7 +51,7 @@ internal class Help2PayDepositClient
             MerchantId = merchantId,
             Amount = order.Amount,
             Currency = order.Currency,
-            PlayerCode = order.PlayerCode,
+            Customer = order.TransactionId.ToString(),
             ClientIp = order.ClientIp,
             Hash = hash,
             ReferenceId = order.TransactionId,

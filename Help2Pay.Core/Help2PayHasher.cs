@@ -2,7 +2,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Tgs.Payment.Help2Pay.Converters;
 
 namespace Tgs.Payment.Help2Pay;

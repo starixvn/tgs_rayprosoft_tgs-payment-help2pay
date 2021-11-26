@@ -35,18 +35,21 @@ internal class WithdrawProcessor : IMessageProcessor
     public async ValueTask<byte[]> HandleAsync(byte[] data, CancellationToken cancellationToken = default)
     {
         var request = WithdrawRequest.Parser.ParseFrom(data);
+
+        _logger.LogInformation($"Withdraw applyInfo: {request.ApplyInfo}");
+
         var settings = _help2PaySerializer.Deserialize<Help2PayWithdrawSettings>(request.ApplyInfo)!;
 
         var order = new WithdrawOrder
         {
-            PlayerCode = settings.PlayerCode,
+            MemberCode = settings.TransactionId.ToString(),
             Amount = decimal.Parse(request.Amount),
             Currency = settings.Currency,
             BankCode = settings.BankCode,
             TransactionId = settings.TransactionId,
             TransactionTime = DateTime.UtcNow,
-            CallbackUrl = $"{_options.CallbackBaseUrl}/api/withdraw/callback",
-            BackAccount = settings.BankAccount,
+            CallbackUrl = $"{_options.CallbackBaseUrl}/withdraw/callback",
+            BankAccount = settings.BankAccount,
             BankAccountName = settings.BankAccountName,
             ClientIp = "127.0.0.1"
         };
@@ -56,6 +59,7 @@ internal class WithdrawProcessor : IMessageProcessor
 
         if (withdrawResponse.StatusCode != "000")
         {
+            _logger.LogError($"Create withdraw form failed. StatusCode: {withdrawResponse.StatusCode}, Reason: {withdrawResponse.Message}");
             throw new ApiException($"Create withdraw form failed. StatusCode: {withdrawResponse.StatusCode}, Reason: {withdrawResponse.Message}");
         }
 

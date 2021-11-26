@@ -28,11 +28,11 @@ internal class WithdrawRequestBody
     [JsonPropertyName("Key")]
     public string Hash { get; init; } = default!;
 
+    [JsonPropertyName("MemberCode")]
+    public string MemberCode { get; init; } = default!;
+
     [JsonPropertyName("MerchantCode")]
     public string MerchantId { get; init; } = default!;
-
-    [JsonPropertyName("MemberCode")]
-    public string PlayerCode { get; init; } = default!;
 
     [JsonPropertyName("TransactionID")]
     public Guid TransactionId { get; init; } = default!;

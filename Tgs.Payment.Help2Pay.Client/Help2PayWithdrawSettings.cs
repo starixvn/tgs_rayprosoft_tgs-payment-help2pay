@@ -4,7 +4,6 @@ namespace Tgs.Payment.Help2Pay
 {
     public record Help2PayWithdrawSettings(
         string MerchantId,
-        string PlayerCode,
         string SecurityCode,
         Guid TransactionId,
         string Currency,
