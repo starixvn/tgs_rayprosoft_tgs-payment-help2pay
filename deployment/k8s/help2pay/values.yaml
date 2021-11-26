@@ -5,23 +5,29 @@
 replicaCount: 1
 
 image:
-  repository: nginx
+  repository: harbor.rpgp.cc/tgs/payment-help2pay
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "latest"
 
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+namespace: dev
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
+imagePullSecrets:
+  - name: secret-tgs-harbor
+
+nameOverride: "payment-help2pay"
+fullnameOverride: "payment-help2pay"
+
+connectionString:
+  redis: localhost,abortConnect=false,connectTimeout=3000
+
+nats: nats://localhost:4222
+
+paymentDepositApiUrl: https://api.testingzone88.com
+paymentWithdrawApiUrl: https://app.testingzone88.com
+paymentQueryApiUrl: https://query.testingzone88.com
+callbackBaseUrl: https://dev-payment.rpgp.cc/help2pay
+paymentServiceBaseUrl: http://payment-api
 
 podAnnotations: {}
 
@@ -40,33 +46,17 @@ service:
   type: ClusterIP
   port: 80
 
-ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
-resources: {}
+resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  limits:
+    cpu: 400m
+    memory: 1Gi
+  requests:
+    cpu: 400m
+    memory: 1GMi
 
 autoscaling:
   enabled: false
