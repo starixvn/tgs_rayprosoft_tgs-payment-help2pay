@@ -114,7 +114,7 @@ pipeline {
                             helm template deployment/k8s/help2pay \
                                 --set image.tag=${TAG} \
                                 --set namespace=$kube_ns \
-                                --set connectionStrings.redis="$tgs_redis" \
+                                --set connectionString.redis="$tgs_redis" \
                                 --set paymentDepositApiUrl="$tgs_paymentDepositApiUrl_help2pay" \
                                 --set paymentWithdrawApiUrl="$tgs_paymentWithdrawApiUrl_help2pay" \
                                 --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
@@ -125,7 +125,7 @@ pipeline {
                             helm template deployment/k8s/help2pay \
                                 --set image.tag=${TAG} \
                                 --set namespace=$kube_ns \
-                                --set connectionStrings.redis="$tgs_redis" \
+                                --set connectionString.redis="$tgs_redis" \
                                 --set paymentDepositApiUrl="$tgs_paymentDepositApiUrl_help2pay" \
                                 --set paymentWithdrawApiUrl="$tgs_paymentWithdrawApiUrl_help2pay" \
                                 --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
