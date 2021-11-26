@@ -11,6 +11,7 @@ RUN dotnet nuget remove source 'Microsoft Visual Studio Offline Packages' || tru
 WORKDIR /src
 COPY ["NuGet.config", "."]
 COPY ["Tgs.Payment.Help2Pay/Tgs.Payment.Help2Pay.csproj", "Tgs.Payment.Help2Pay/"]
+COPY ["Tgs.Payment.Help2Pay.Repository/Tgs.Payment.Help2Pay.Repository.csproj", "Tgs.Payment.Help2Pay.Repository/"]
 COPY ["Help2Pay.Core/Help2Pay.Core.csproj", "Help2Pay.Core/"]
 COPY ["Tgs.Payment.Help2Pay.Client/Tgs.Payment.Help2Pay.Client.csproj", "Tgs.Payment.Help2Pay.Client/"]
 RUN dotnet restore "Tgs.Payment.Help2Pay/Tgs.Payment.Help2Pay.csproj"

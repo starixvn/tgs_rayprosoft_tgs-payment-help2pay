@@ -4,6 +4,7 @@
     <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <RootNamespace>Tgs.Payment.Help2Pay</RootNamespace>
+    <LangVersion>10</LangVersion>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <PackageId>Tgs.Payment.Help2Pay.Client</PackageId>
     <PackageTags>tgs payment</PackageTags>
