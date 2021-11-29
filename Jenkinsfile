@@ -74,7 +74,7 @@ pipeline {
 
 			steps {
 				sh 'dotnet pack -c $BuildConfiguration "Tgs.Payment.Help2Pay.Client/Tgs.Payment.Help2Pay.Client.csproj" --no-build'
-				sh 'dotnet nuget push "Tgs.Payment.Help2Pay.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+				sh 'dotnet nuget push "Tgs.Payment.Help2Pay.Client/bin/$BuildConfiguration/*.nupkg" -s "raypro-baget" -k admin --skip-duplicate'
 			}
 		}
 
