@@ -118,7 +118,7 @@ public class WithdrawController : ControllerBase
                     .ExecuteAsync(new SaveWithdrawReturnCommand(
                         withdrawForm.Id,
                         formStatus,
-                        returnData.Amount,
+                        returnData.Amount / withdrawForm.ApplyInfo.Settings.ExchangeRate,
                         returnData))
                     .ConfigureAwait(false);
         }

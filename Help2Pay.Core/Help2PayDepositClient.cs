@@ -78,7 +78,7 @@ internal class Help2PayDepositClient
 
         if (string.IsNullOrWhiteSpace(html))
         {
-            throw new ApiException("Responsed html should not be null or empty.");
+            throw new ApiException("Response html should not be null or empty.");
         }
 
         return html;

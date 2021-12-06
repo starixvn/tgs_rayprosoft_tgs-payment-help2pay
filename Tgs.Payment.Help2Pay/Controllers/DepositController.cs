@@ -84,12 +84,12 @@ public class DepositController : ControllerBase
             // Deposit callback status:
             // 000 => Success  ( System process with no error )
             // 006 => Approved ( Manual Approved )
-            if (depositModel.Status == "000" || depositModel.Status == "006")
+            if (depositModel.Status is "000" or "006")
             {
                 var approveCommand = new ApproveDepositFormCommand(
                             depositForm.Id,
                             depositForm.BrandId,
-                            depositModel.Amount);
+                            depositModel.Amount / depositForm.ApplyInfo.Settings.ExchangeRate);
 
                 await approveService.ExecuteAsync(approveCommand).ConfigureAwait(false);
             }

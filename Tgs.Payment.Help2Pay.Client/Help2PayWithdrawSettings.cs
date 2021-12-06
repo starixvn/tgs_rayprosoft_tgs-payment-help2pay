@@ -9,5 +9,6 @@ namespace Tgs.Payment.Help2Pay
         string Currency,
         string BankAccount,
         string BankAccountName,
-        string BankCode);
+        string BankCode,
+        decimal ExchangeRate);
 }

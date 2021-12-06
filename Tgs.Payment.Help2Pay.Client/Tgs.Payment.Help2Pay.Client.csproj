@@ -10,7 +10,7 @@
     <RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment-help2pay.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>tgs payment</PackageTags>
-    <Version>0.0.4</Version>
+    <Version>0.0.5</Version>
     <Authors>Raypro</Authors>
   </PropertyGroup>
 
