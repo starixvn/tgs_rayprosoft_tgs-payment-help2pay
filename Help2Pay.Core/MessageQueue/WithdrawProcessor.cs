@@ -43,7 +43,7 @@ internal class WithdrawProcessor : IMessageProcessor
         var order = new WithdrawOrder
         {
             MemberCode = settings.TransactionId.ToString(),
-            Amount = decimal.Parse(request.Amount),
+            Amount = decimal.Parse(request.Amount) * settings.ExchangeRate,
             Currency = settings.Currency,
             BankCode = settings.BankCode,
             TransactionId = settings.TransactionId,
@@ -54,7 +54,8 @@ internal class WithdrawProcessor : IMessageProcessor
             ClientIp = "127.0.0.1"
         };
 
-        var withdrawResponse = await _help2PayWithdrawClient.WithdrawAsync(settings.MerchantId, settings.SecurityCode, order)
+        var withdrawResponse = await _help2PayWithdrawClient
+            .WithdrawAsync(settings.MerchantId, settings.SecurityCode, order)
             .ConfigureAwait(false);
 
         if (withdrawResponse.StatusCode != "000")

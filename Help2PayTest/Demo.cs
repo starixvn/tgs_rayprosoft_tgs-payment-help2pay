@@ -40,7 +40,8 @@ internal class Demo : BackgroundService
                         "BDO",
                         Guid.NewGuid(),
                         "http://www.google.com",
-                        "127.0.0.1");
+                        "127.0.0.1",
+                        1m);
 
         var paymentReturn = await _paymentClient.DepositAsync(
             "tgs.payment.help2pay.deposit",
@@ -60,7 +61,8 @@ internal class Demo : BackgroundService
                        "PHP",
                        "1213015890",
                        "steave",
-                       "BDO");
+                       "BDO",
+                       1m);
 
         var withdrawReturn = await _paymentClient.WithdrawAsync(
             "tgs.payment.help2pay.withdraw",
