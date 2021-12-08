@@ -30,6 +30,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
     });
 
+builder.Configuration.AddJsonFile("/config/appsettings.json", true);
 builder.Logging.AddTgsLog();
 
 builder.Services.AddEndpointsApiExplorer();
