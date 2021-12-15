@@ -35,7 +35,7 @@ internal class DepositProcessor : IMessageProcessor
 
         var order = new DepositOrder
         {
-            Amount = decimal.Parse(request.Amount),
+            Amount = decimal.Parse(request.Amount) * settings.ExchangeRate,
             Currency = settings.Currency,
             BankCode = settings.BankCode,
             Customer = settings.TransactionId.ToString(),

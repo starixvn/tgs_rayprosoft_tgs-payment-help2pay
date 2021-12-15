@@ -9,5 +9,6 @@ namespace Tgs.Payment.Help2Pay
         string BankCode,
         Guid TransactionId,
         string ResponseUrl,
-        string ClientIp);
+        string ClientIp,
+        decimal ExchangeRate);
 }
