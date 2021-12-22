@@ -45,9 +45,8 @@ public class Help2PayHasher
             .Select(p => p.Value));
 
         var value = $"{merchantId}{content}{securityCode}{ip}";
+        var hash = MD5.HashData(Encoding.UTF8.GetBytes(value));
 
-        var hash = new BigInteger(MD5.HashData(Encoding.UTF8.GetBytes(value)), isBigEndian: true).ToString("x");
-
-        return hash;
+        return string.Join("", hash.Select(b => b.ToString("x2")));
     }
 }
