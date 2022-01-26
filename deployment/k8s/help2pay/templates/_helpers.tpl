@@ -35,6 +35,7 @@ Common labels
 */}}
 {{- define "help2pay.labels" -}}
 {{ include "help2pay.selectorLabels" . }}
+tgs.kind: payment
 {{- end }}
 
 {{/*

@@ -3,6 +3,7 @@ apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ include "help2pay.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "help2pay.labels" . | nindent 4 }}
 spec:

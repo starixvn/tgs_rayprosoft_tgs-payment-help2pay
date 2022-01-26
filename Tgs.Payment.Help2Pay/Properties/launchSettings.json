@@ -14,7 +14,9 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "OTEL_SERVICE_NAME": "Payment-Help2pay(local)",
+        "NODE_IP": "192.168.50.112"
       },
       "applicationUrl": "http://localhost:5080;http://+:5080",
       "dotnetRunMessages": true

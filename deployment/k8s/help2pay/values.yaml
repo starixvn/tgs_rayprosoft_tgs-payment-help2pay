@@ -10,11 +10,8 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
-namespace: dev
-
 imagePullSecrets:
   - name: secret-tgs-harbor
-
 nameOverride: "payment-help2pay"
 fullnameOverride: "payment-help2pay"
 
@@ -22,7 +19,6 @@ connectionString:
   redis: localhost,abortConnect=false,connectTimeout=3000
 
 nats: nats://localhost:4222
-
 paymentDepositApiUrl: https://api.testingzone88.com
 paymentWithdrawApiUrl: https://app.testingzone88.com
 paymentQueryApiUrl: https://query.testingzone88.com
@@ -63,7 +59,7 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 
