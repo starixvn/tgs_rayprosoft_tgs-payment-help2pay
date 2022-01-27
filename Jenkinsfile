@@ -142,6 +142,7 @@ pipeline {
                                 --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
                                 --set nats="$tgs_nats" \
                                 --set callbackBaseUrl="$tgs_paymentCallbackBaseUrl_help2pay" \
+                                -f - \
                             | kubectl -n ${kube_ns} apply -f -
                             {
                                 "nodeSelector": $node_selector,
