@@ -34,7 +34,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: OTEL_SERVICE_NAME
-              value: Payment-Maticpay({{ .Release.Namespace }})
+              value: Payment-Help2pay({{ .Release.Namespace }})
             - name: NODE_IP
               valueFrom:
                 fieldRef:
