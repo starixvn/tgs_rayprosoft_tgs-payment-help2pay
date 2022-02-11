@@ -119,6 +119,7 @@ pipeline {
                     withKubeConfig([credentialsId: env.k8s_config]) {
 
                         def resources = getResources(env.k8s_config, env.kube_ns, "payment-help2pay")
+                        println resources
 
                         withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "tgs_tgs_conn")]) {
                             sh '''
