@@ -125,33 +125,33 @@ pipeline {
                         sh 'echo resources: ${resources}'
                         
                         withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "tgs_tgs_conn")]) {
-                            sh '''
+                            sh """
                                 cat << EOF | yq e -P | helm template deployment/k8s/help2pay \
                                     -n ${kube_ns} \
                                     --set image.tag=${TAG} \
-                                    --set connectionString.redis="$tgs_redis" \
-                                    --set paymentDepositApiUrl="$tgs_paymentDepositApiUrl_help2pay" \
-                                    --set paymentWithdrawApiUrl="$tgs_paymentWithdrawApiUrl_help2pay" \
-                                    --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
-                                    --set nats="$tgs_nats" \
-                                    --set callbackBaseUrl="$tgs_paymentCallbackBaseUrl_help2pay" \
+                                    --set connectionString.redis=$tgs_redis \
+                                    --set paymentDepositApiUrl=$tgs_paymentDepositApiUrl_help2pay \
+                                    --set paymentWithdrawApiUrl=$tgs_paymentWithdrawApiUrl_help2pay \
+                                    --set paymentQueryApiUrl=$tgs_paymentQueryApiUrl_help2pay \
+                                    --set nats=$tgs_nats \
+                                    --set callbackBaseUrl=$tgs_paymentCallbackBaseUrl_help2pay \
                                     -f -
                                 {
                                     "nodeSelector": $node_selector,
                                     "tolerations": [$dedicated],
                                     "resources": $resources
                                 }
-                            '''
-                            sh '''
+                            """
+                            sh """
                                 cat << EOF | yq e -P | helm template deployment/k8s/help2pay \
                                     -n ${kube_ns} \
                                     --set image.tag=${TAG} \
-                                    --set connectionString.redis="$tgs_redis" \
-                                    --set paymentDepositApiUrl="$tgs_paymentDepositApiUrl_help2pay" \
-                                    --set paymentWithdrawApiUrl="$tgs_paymentWithdrawApiUrl_help2pay" \
-                                    --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
-                                    --set nats="$tgs_nats" \
-                                    --set callbackBaseUrl="$tgs_paymentCallbackBaseUrl_help2pay" \
+                                    --set connectionString.redis=$tgs_redis \
+                                    --set paymentDepositApiUrl=$tgs_paymentDepositApiUrl_help2pay \
+                                    --set paymentWithdrawApiUrl=$tgs_paymentWithdrawApiUrl_help2pay \
+                                    --set paymentQueryApiUrl=$tgs_paymentQueryApiUrl_help2pay \
+                                    --set nats=$tgs_nats \
+                                    --set callbackBaseUrl=$tgs_paymentCallbackBaseUrl_help2pay \
                                     -f - \
                                 | kubectl -n ${kube_ns} apply -f -
                                 {
@@ -159,7 +159,7 @@ pipeline {
                                     "tolerations": [$dedicated],
                                     "resources": $resources
                                 }
-                            '''
+                            """
                         }
                     }
                 }
