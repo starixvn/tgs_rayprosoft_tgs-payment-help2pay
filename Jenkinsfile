@@ -1,3 +1,4 @@
+@Library('global-shared-library') _
 def message = "";
 
 pipeline {
@@ -114,41 +115,48 @@ pipeline {
 
 		stage('Deploy to k8s') {			
 			steps {
-				withKubeConfig([credentialsId: env.k8s_config]) {        
-                    withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "tgs_tgs_conn")]) {
-                        sh '''
-                            cat << EOF | yq e -P | helm template deployment/k8s/help2pay \
-                                -n ${kube_ns} \
-                                --set image.tag=${TAG} \
-                                --set connectionString.redis="$tgs_redis" \
-                                --set paymentDepositApiUrl="$tgs_paymentDepositApiUrl_help2pay" \
-                                --set paymentWithdrawApiUrl="$tgs_paymentWithdrawApiUrl_help2pay" \
-                                --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
-                                --set nats="$tgs_nats" \
-                                --set callbackBaseUrl="$tgs_paymentCallbackBaseUrl_help2pay" \
-                                -f -
-                            {
-                                "nodeSelector": $node_selector,
-                                "tolerations": [$dedicated]
-                            }
-                        '''
-                        sh '''
-                            cat << EOF | yq e -P | helm template deployment/k8s/help2pay \
-                                -n ${kube_ns} \
-                                --set image.tag=${TAG} \
-                                --set connectionString.redis="$tgs_redis" \
-                                --set paymentDepositApiUrl="$tgs_paymentDepositApiUrl_help2pay" \
-                                --set paymentWithdrawApiUrl="$tgs_paymentWithdrawApiUrl_help2pay" \
-                                --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
-                                --set nats="$tgs_nats" \
-                                --set callbackBaseUrl="$tgs_paymentCallbackBaseUrl_help2pay" \
-                                -f - \
-                            | kubectl -n ${kube_ns} apply -f -
-                            {
-                                "nodeSelector": $node_selector,
-                                "tolerations": [$dedicated]
-                            }
-                        '''
+                script {
+                    withKubeConfig([credentialsId: env.k8s_config]) {
+
+                        def resources = getResources('stag-k8s-config', params['TgsEnv'], arr[i])
+
+                        withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "tgs_tgs_conn")]) {
+                            sh '''
+                                cat << EOF | yq e -P | helm template deployment/k8s/help2pay \
+                                    -n ${kube_ns} \
+                                    --set image.tag=${TAG} \
+                                    --set connectionString.redis="$tgs_redis" \
+                                    --set paymentDepositApiUrl="$tgs_paymentDepositApiUrl_help2pay" \
+                                    --set paymentWithdrawApiUrl="$tgs_paymentWithdrawApiUrl_help2pay" \
+                                    --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
+                                    --set nats="$tgs_nats" \
+                                    --set callbackBaseUrl="$tgs_paymentCallbackBaseUrl_help2pay" \
+                                    -f -
+                                {
+                                    "nodeSelector": $node_selector,
+                                    "tolerations": [$dedicated],
+                                    "resources": $resources
+                                }
+                            '''
+                            sh '''
+                                cat << EOF | yq e -P | helm template deployment/k8s/help2pay \
+                                    -n ${kube_ns} \
+                                    --set image.tag=${TAG} \
+                                    --set connectionString.redis="$tgs_redis" \
+                                    --set paymentDepositApiUrl="$tgs_paymentDepositApiUrl_help2pay" \
+                                    --set paymentWithdrawApiUrl="$tgs_paymentWithdrawApiUrl_help2pay" \
+                                    --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
+                                    --set nats="$tgs_nats" \
+                                    --set callbackBaseUrl="$tgs_paymentCallbackBaseUrl_help2pay" \
+                                    -f - \
+                                | kubectl -n ${kube_ns} apply -f -
+                                {
+                                    "nodeSelector": $node_selector,
+                                    "tolerations": [$dedicated],
+                                    "resources": $resources
+                                }
+                            '''
+                        }
                     }
                 }
 			}
