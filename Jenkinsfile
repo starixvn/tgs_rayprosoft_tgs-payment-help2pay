@@ -120,7 +120,7 @@ pipeline {
 
                         def resources = getResources(env.k8s_config, env.kube_ns, "payment-help2pay")
                         println resources
-
+                        echo "$resources"
                         withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "tgs_tgs_conn")]) {
                             sh '''
                                 cat << EOF | yq e -P | helm template deployment/k8s/help2pay \
