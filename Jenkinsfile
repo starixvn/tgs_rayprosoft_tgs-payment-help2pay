@@ -121,7 +121,8 @@ pipeline {
                         def resources = getResources(env.k8s_config, env.kube_ns, "payment-help2pay")
                         println resources
                         echo "$resources"
-                        sh 'echo resources: $resources'
+                        sh "echo resources: $resources"
+                        sh 'echo resources: ${resources}'
                         
                         withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "tgs_tgs_conn")]) {
                             sh '''
