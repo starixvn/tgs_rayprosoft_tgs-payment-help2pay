@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
 {
     public static Help2PayConfiguration AddHelp2Pay(this IServiceCollection services, Action<Help2PayOptions, IServiceProvider> configure)
     {
-        services
+        _ = services
             .AddOptions<Help2PayOptions>()
             .Configure(configure)
             .Services
@@ -20,20 +20,17 @@ public static class ServiceCollectionExtensions
             .AddTransient<Help2PayHasher>()
             .AddTransient<Help2PaySerializer>()
             .AddMessageQueue()
-            .AddNatsMessageQueue(config =>
-            {
-                config
-                    .ConfigQueueOptions((options, sp) =>
-                    {
-                        var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
-                        options.Url = help2PayOptions.NatsUrl;
-                    })
-                    .AddProcessor<DepositProcessor>("tgs.payment.help2pay.deposit", "tgs.payment.help2pay.deposit")
-                    .AddProcessor<WithdrawProcessor>("tgs.payment.help2pay.withdraw", "tgs.payment.help2pay.withdraw");
-            })
+            .AddNatsMessageQueue(config => config
+                .ConfigQueueOptions((options, sp) =>
+                {
+                    var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
+                    options.Url = help2PayOptions.NatsUrl;
+                })
+                .AddProcessor<DepositProcessor>("tgs.payment.help2pay.deposit", "tgs.payment.help2pay.deposit")
+                .AddProcessor<WithdrawProcessor>("tgs.payment.help2pay.withdraw", "tgs.payment.help2pay.withdraw"))
             .AddNatsGlobPatternExchange("*");
 
-        services
+        _ = services
             .AddHttpClient<Help2PayDepositClient>((sp, httpClient)
             =>
             {
@@ -41,7 +38,7 @@ public static class ServiceCollectionExtensions
                 httpClient.BaseAddress = options.PaymentDepositApiUrl;
             });
 
-        services
+        _ = services
             .AddHttpClient<Help2PayQueryClient>((sp, httpClient)
             =>
             {
@@ -49,7 +46,7 @@ public static class ServiceCollectionExtensions
                 httpClient.BaseAddress = options.PaymentQueryApiUrl;
             });
 
-        services
+        _ = services
             .AddHttpClient<Help2PayWithdrawClient>((sp, httpClient)
             =>
             {
@@ -57,7 +54,7 @@ public static class ServiceCollectionExtensions
                 httpClient.BaseAddress = options.PaymentWithdrawApiUrl;
             });
 
-        services
+        _ = services
             .AddPaymentServiceClient((options, sp) =>
             {
                 var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;

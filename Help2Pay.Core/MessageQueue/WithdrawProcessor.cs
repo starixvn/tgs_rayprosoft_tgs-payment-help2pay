@@ -17,12 +17,12 @@ internal class WithdrawProcessor : IMessageProcessor
     private readonly IPaymentClient _paymentClient;
 
     public WithdrawProcessor(
-        ILogger<WithdrawProcessor> logger,
         IOptions<Help2PayOptions> options,
         Help2PaySerializer help2PaySerializer,
         Help2PayWithdrawClient help2PayWithdrawClient,
         Help2PayQueryClient help2PayQueryClient,
-        IPaymentClient paymentClient)
+        IPaymentClient paymentClient,
+        ILogger<WithdrawProcessor> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
@@ -32,9 +32,9 @@ internal class WithdrawProcessor : IMessageProcessor
         _paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
     }
 
-    public async ValueTask<byte[]> HandleAsync(byte[] data, CancellationToken cancellationToken = default)
+    public async ValueTask<ReadOnlyMemory<byte>> HandleAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
     {
-        var request = WithdrawRequest.Parser.ParseFrom(data);
+        var request = WithdrawRequest.Parser.ParseFrom(data.Span);
 
         _logger.LogInformation($"Withdraw applyInfo: {request.ApplyInfo}");
 
