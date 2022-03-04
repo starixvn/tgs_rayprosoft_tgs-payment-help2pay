@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using Microsoft.Extensions.Logging;
 
 namespace Tgs.Payment.Help2Pay;
@@ -33,18 +28,15 @@ internal class Help2PayQueryClient
 
         _logger.LogInformation($"Query Payment Deposit Id Body: {data}");
 
-        response.EnsureSuccessStatusCode();
+        _ = response.EnsureSuccessStatusCode();
 
         using var sr = new StringReader(data);
         var serializer = new XmlSerializer(typeof(QueryPaymentDespositFormResponse));
         var depositResponse = (QueryPaymentDespositFormResponse)serializer.Deserialize(sr)!;
 
-        if (string.IsNullOrWhiteSpace(depositResponse.DepositId) || depositResponse.DepositId == "0")
-        {
-            throw new ApiException($"Invalid Payment Deposit Id.");
-        }
-
-        return depositResponse.DepositId;
+        return string.IsNullOrWhiteSpace(depositResponse.DepositId) || depositResponse.DepositId == "0"
+            ? throw new ApiException($"Invalid Payment Deposit Id.")
+            : depositResponse.DepositId;
     }
 
     public async ValueTask<string> QueryPaymentWithdrawIdAsync(string merchantId, Guid formId)
@@ -59,17 +51,14 @@ internal class Help2PayQueryClient
 
         _logger.LogInformation($"Query Payment Withdraw Id Body: {data}");
 
-        response.EnsureSuccessStatusCode();
+        _ = response.EnsureSuccessStatusCode();
 
         using var sr = new StringReader(data);
         var serializer = new XmlSerializer(typeof(QueryPaymentWithdrawFormResponse));
         var withdrawResponse = (QueryPaymentWithdrawFormResponse)serializer.Deserialize(sr)!;
 
-        if (string.IsNullOrWhiteSpace(withdrawResponse.WithdrawId) || withdrawResponse.WithdrawId == "0")
-        {
-            throw new ApiException($"Invalid Payment Withdraw Id.");
-        }
-
-        return withdrawResponse.WithdrawId;
+        return string.IsNullOrWhiteSpace(withdrawResponse.WithdrawId) || withdrawResponse.WithdrawId == "0"
+            ? throw new ApiException($"Invalid Payment Withdraw Id.")
+            : withdrawResponse.WithdrawId;
     }
 }

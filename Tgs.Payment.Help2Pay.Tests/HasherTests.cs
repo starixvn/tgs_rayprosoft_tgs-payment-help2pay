@@ -118,8 +118,8 @@ public class HasherTests
         Assert.AreEqual(expected, actual);
     }
 
-    private string HashCode(string original)
+    private static string HashCode(string original)
         => string.Join(
-                string.Empty,
-                MD5.HashData(Encoding.UTF8.GetBytes(original)).Select(b => b.ToString("x2")));
+            string.Empty,
+            MD5.HashData(Encoding.UTF8.GetBytes(original)).Select(b => b.ToString("x2")));
 }

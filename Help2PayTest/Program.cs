@@ -10,12 +10,12 @@ static IHostBuilder CreateHostBuilder(string[] args)
     => Host.CreateDefaultBuilder(args)
         .ConfigureServices(services =>
         {
-            services.AddMessageQueue()
+            _ = services.AddMessageQueue()
                 .AddNatsMessageQueue(_ => { })
                 .AddNatsGlobPatternExchange("*");
 
-            services.AddPaymentClient();
-            services.AddSingleton<Help2PaySerializer>();
-
-            services.AddHostedService<Demo>();
+            _ = services
+                .AddPaymentClient()
+                .AddSingleton<Help2PaySerializer>()
+                .AddHostedService<Demo>();
         });

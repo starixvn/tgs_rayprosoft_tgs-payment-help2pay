@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Tgs.Payment.Help2Pay.Converters;
@@ -8,7 +7,7 @@ namespace Tgs.Payment.Help2Pay;
 
 public class Help2PayHasher
 {
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         WriteIndented = false,
         Converters =
@@ -18,7 +17,7 @@ public class Help2PayHasher
         }
     };
 
-    private readonly Dictionary<string, int> _weight = new Dictionary<string, int>
+    private readonly Dictionary<string, int> _weight = new()
     {
         ["Reference"] = 1,
         ["TransactionID"] = 1,

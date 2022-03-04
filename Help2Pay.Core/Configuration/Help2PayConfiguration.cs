@@ -13,7 +13,7 @@ public class Help2PayConfiguration
 
     public Help2PayConfiguration UseRepository<TRepository>() where TRepository : class, IWithdrawDataStore
     {
-        Services.AddTransient<IWithdrawDataStore, TRepository>();
+        _ = Services.AddTransient<IWithdrawDataStore, TRepository>();
 
         return this;
     }
