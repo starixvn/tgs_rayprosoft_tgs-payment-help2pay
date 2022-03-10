@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "help2pay.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "help2pay.labels" . | nindent 4 }}
 spec:

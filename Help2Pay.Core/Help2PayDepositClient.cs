@@ -9,7 +9,7 @@ internal class Help2PayDepositClient
     private readonly Help2PayHasher _hasher;
     private readonly HttpClient _httpClient;
 
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         WriteIndented = false,
         Converters =
@@ -74,14 +74,9 @@ internal class Help2PayDepositClient
 
         _logger.LogInformation($"Deposit Body: {html}");
 
-        response.EnsureSuccessStatusCode();
+        _ = response.EnsureSuccessStatusCode();
 
-        if (string.IsNullOrWhiteSpace(html))
-        {
-            throw new ApiException("Response html should not be null or empty.");
-        }
-
-        return html;
+        return string.IsNullOrWhiteSpace(html) ? throw new ApiException("Response html should not be null or empty.") : html;
     }
 
     private IEnumerable<KeyValuePair<string, string>> SerializeToFormParameters<T>(T data)

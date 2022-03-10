@@ -1,7 +1,11 @@
-using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,18 +40,50 @@ builder.Logging.AddTgsLog();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHealthChecks();
+
+builder.Services
+    .AddOptions<OtlpExporterOptions>()
+    .Configure<IConfiguration>((options, conifg) =>
+    {
+        var nodeIp = conifg.GetValue<string>("NODE_IP");
+
+        if (!string.IsNullOrWhiteSpace(nodeIp))
+            options.Endpoint = new Uri($"http://{nodeIp}:4317");
+
+        conifg.GetSection("Opentelemetry:Tracing").Bind(options);
+    });
+
+builder.Services.AddOpenTelemetryTracing(builder => builder
+    .SetResourceBuilder(ResourceBuilder.CreateDefault()
+    .AddEnvironmentVariableDetector())
+    .AddSource("Tgs.*")
+    .AddAspNetCoreInstrumentation()
+    .AddHttpClientInstrumentation()
+    .AddProfileViewExporter()
+    .AddOtlpExporter());
+
+builder.Services.Configure<AspNetCoreInstrumentationOptions>(options =>
+{
+    options.Filter = httpContext =>
+    {
+        return !httpContext.Request.Path.HasValue
+            || !httpContext.Request.Path.StartsWithSegments("/swagger")
+            && !httpContext.Request.Path.StartsWithSegments("/healthz")
+            && !httpContext.Request.Path.StartsWithSegments("/profiler/")
+            && !new[] { "html", "ico", "png", "jpg" }.Any(
+                ext => httpContext.Request.Path.Value.EndsWith($".{ext}"));
+    };
+});
+
+builder.Services.AddProfileViewer();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
+app.UseSwaggerUI();
+app.MapSwagger();
 app.MapControllers();
-app.MapGet("/", async context => await context.Response.WriteAsync("Hello World"));
+app.MapHealthChecks("/healthz");
+app.MapProfileViewer();
 
 app.Run();

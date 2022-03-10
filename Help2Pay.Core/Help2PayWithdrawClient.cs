@@ -10,7 +10,7 @@ internal class Help2PayWithdrawClient
     private readonly Help2PayHasher _hasher;
     private readonly HttpClient _httpClient;
 
-    private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         WriteIndented = false,
         Converters =
@@ -49,7 +49,7 @@ internal class Help2PayWithdrawClient
 
         var hash = _hasher.ComputeHash(merchantId, securityCode, info);
 
-        await _store.StoreHashAsync(hash, order.TransactionId).ConfigureAwait(false);
+        _ = await _store.StoreHashAsync(hash, order.TransactionId).ConfigureAwait(false);
 
         var request = new WithdrawRequestBody
         {
@@ -79,7 +79,7 @@ internal class Help2PayWithdrawClient
 
         _logger.LogInformation($"Withdraw Body: {xmlBody}");
 
-        response.EnsureSuccessStatusCode();
+        _ = response.EnsureSuccessStatusCode();
 
         using var sr = new StringReader(xmlBody);
         var serializer = new XmlSerializer(typeof(WithdrawFormResponse));

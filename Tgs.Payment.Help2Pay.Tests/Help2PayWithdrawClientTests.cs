@@ -24,7 +24,7 @@ public class Help2PayWithdrawClientTests
             Content = new StringContent(@"<Payout><statusCode>000</statusCode><message>Success</message></Payout>"),
         };
 
-        mockHttpMessageHandler
+        _ = mockHttpMessageHandler
             .Protected()
             .Setup<Task<HttpResponseMessage>>(
             "SendAsync",

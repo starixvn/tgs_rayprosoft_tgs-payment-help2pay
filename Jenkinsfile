@@ -1,3 +1,4 @@
+@Library('global-shared-library') _
 def message = "";
 
 pipeline {
@@ -18,14 +19,20 @@ pipeline {
                         case ['main', 'origin/main']:
                             env.kube_ns = "prod";
                             env.k8s_config = 'stag-k8s-config';
+                            env.node_selector = '{ "dedicated": "prod" }';
+                            env.dedicated = '{"effect":"NoSchedule","key": "dedicated", "operator": "Equal", "value": "prod"}';
                             break;
                         case ['release', 'origin/release']:
                             env.kube_ns = "staging";
                             env.k8s_config = 'stag-k8s-config';
+                            env.node_selector = '{ "dedicated": "nonprod" }';
+                            env.dedicated = '{"effect":"NoSchedule","key": "dedicated", "operator": "Equal", "value": "noprod"}';
                             break;
                         default:
                             env.kube_ns = "dev";
-                            env.k8s_config = 'k8s-kube-config' 
+                            env.k8s_config = 'k8s-kube-config';
+                            env.node_selector = '{}';
+                            env.dedicated = ''; 
                             break;
                     }
 				}
@@ -108,37 +115,55 @@ pipeline {
 
 		stage('Deploy to k8s') {			
 			steps {
-				withKubeConfig([credentialsId: env.k8s_config]) {        
-                    withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "tgs_tgs_conn")]) {
-                        sh '''
-                            helm template deployment/k8s/help2pay \
-                                --set image.tag=${TAG} \
-                                --set namespace=$kube_ns \
-                                --set connectionString.redis="$tgs_redis" \
-                                --set paymentDepositApiUrl="$tgs_paymentDepositApiUrl_help2pay" \
-                                --set paymentWithdrawApiUrl="$tgs_paymentWithdrawApiUrl_help2pay" \
-                                --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
-                                --set nats="$tgs_nats" \
-                                --set callbackBaseUrl="$tgs_paymentCallbackBaseUrl_help2pay"
-                        '''
-                        sh '''
-                            helm template deployment/k8s/help2pay \
-                                --set image.tag=${TAG} \
-                                --set namespace=$kube_ns \
-                                --set connectionString.redis="$tgs_redis" \
-                                --set paymentDepositApiUrl="$tgs_paymentDepositApiUrl_help2pay" \
-                                --set paymentWithdrawApiUrl="$tgs_paymentWithdrawApiUrl_help2pay" \
-                                --set paymentQueryApiUrl="$tgs_paymentQueryApiUrl_help2pay" \
-                                --set nats="$tgs_nats" \
-                                --set callbackBaseUrl="$tgs_paymentCallbackBaseUrl_help2pay" \
-                            | kubectl -n $kube_ns apply -f -
-                        '''
+                script {
+                    withKubeConfig([credentialsId: env.k8s_config]) {
+
+                        def resources = getResources(env.k8s_config, env.kube_ns, "payment-help2pay")
+                        println resources
+
+                        withCredentials([string(credentialsId: "tgs-${kube_ns}-connectionstring", variable: "tgs_tgs_conn")]) {
+                            sh """
+                                cat << EOF | yq e -P | helm template deployment/k8s/help2pay \
+                                    -n ${kube_ns} \
+                                    --set image.tag=${TAG} \
+                                    --set connectionString.redis=$tgs_redis \
+                                    --set paymentDepositApiUrl=$tgs_paymentDepositApiUrl_help2pay \
+                                    --set paymentWithdrawApiUrl=$tgs_paymentWithdrawApiUrl_help2pay \
+                                    --set paymentQueryApiUrl=$tgs_paymentQueryApiUrl_help2pay \
+                                    --set nats=$tgs_nats \
+                                    --set callbackBaseUrl=$tgs_paymentCallbackBaseUrl_help2pay \
+                                    -f -
+                                {
+                                    "nodeSelector": $node_selector,
+                                    "tolerations": [$dedicated],
+                                    "resources": $resources
+                                }
+                            """
+                            sh """
+                                cat << EOF | yq e -P | helm template deployment/k8s/help2pay \
+                                    -n ${kube_ns} \
+                                    --set image.tag=${TAG} \
+                                    --set connectionString.redis=$tgs_redis \
+                                    --set paymentDepositApiUrl=$tgs_paymentDepositApiUrl_help2pay \
+                                    --set paymentWithdrawApiUrl=$tgs_paymentWithdrawApiUrl_help2pay \
+                                    --set paymentQueryApiUrl=$tgs_paymentQueryApiUrl_help2pay \
+                                    --set nats=$tgs_nats \
+                                    --set callbackBaseUrl=$tgs_paymentCallbackBaseUrl_help2pay \
+                                    -f - \
+                                | kubectl -n ${kube_ns} apply -f -
+                                {
+                                    "nodeSelector": $node_selector,
+                                    "tolerations": [$dedicated],
+                                    "resources": $resources
+                                }
+                            """
+                        }
                     }
                 }
 			}
 		}
 
-		stage('Add Tag') {
+		stage('Add Tag on Prod') {
             when {
                 expression {
                     return env.kube_ns == 'prod';
@@ -150,15 +175,7 @@ pipeline {
                     sh "git push ${GIT_URL} ${TAG} HEAD:${GIT_BRANCH}"
                 }
             }
-        }
-
-		stage('Remove Image Tags') {					
-            steps {	
-			    withCredentials([string(credentialsId: "GitLabToken", variable: "GitLabToken")]) {					
-                    //sh "curl --request DELETE --data \'name_regex_delete=.*\' --data \'keep_n=10\' --header \'PRIVATE-TOKEN: ${GitLabToken}\' ${ImageTagUrl}"
-                }
-            }
-        }	
+        }		
 	}
 
 	post {
@@ -172,18 +189,4 @@ pipeline {
             sendTelegram("<b>Failed Pipeline:</b> ${currentBuild.fullDisplayName} Something is wrong with ${env.BUILD_URL}/console\n${currentBuild.getBuildCauses()[0].shortDescription}\n")
         }		
 	}
-}
-
-def sendTelegram(message) {
-    def encodedMessage = URLEncoder.encode(message, "UTF-8")
-
-    withCredentials([string(credentialsId: "telegramToken", variable: "TOKEN"), string(credentialsId: "telegramChatId", variable: "CHAT_ID")]) {
-
-        response = httpRequest (consoleLogResponseBody: true,
-                contentType: 'APPLICATION_JSON',
-                httpMode: 'GET',
-                url: "https://api.telegram.org/bot${TOKEN}/sendMessage?text=${encodedMessage}&chat_id=${CHAT_ID}",
-                validResponseCodes: '200')
-        return response
-    }
 }
