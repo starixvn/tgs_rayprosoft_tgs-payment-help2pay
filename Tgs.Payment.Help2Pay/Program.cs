@@ -60,7 +60,6 @@ builder.Services.AddOpenTelemetryTracing(builder => builder
     .AddSource("Tgs.*")
     .AddAspNetCoreInstrumentation()
     .AddHttpClientInstrumentation()
-    .AddProfileViewExporter()
     .AddOtlpExporter());
 
 builder.Services.Configure<AspNetCoreInstrumentationOptions>(options =>
@@ -71,12 +70,11 @@ builder.Services.Configure<AspNetCoreInstrumentationOptions>(options =>
             || !httpContext.Request.Path.StartsWithSegments("/swagger")
             && !httpContext.Request.Path.StartsWithSegments("/healthz")
             && !httpContext.Request.Path.StartsWithSegments("/profiler/")
+            && !httpContext.Request.Path.StartsWithSegments("/metrics")
             && !new[] { "html", "ico", "png", "jpg" }.Any(
                 ext => httpContext.Request.Path.Value.EndsWith($".{ext}"));
     };
 });
-
-builder.Services.AddProfileViewer();
 
 var app = builder.Build();
 
@@ -84,6 +82,5 @@ app.UseSwaggerUI();
 app.MapSwagger();
 app.MapControllers();
 app.MapHealthChecks("/healthz");
-app.MapProfileViewer();
 
 app.Run();
