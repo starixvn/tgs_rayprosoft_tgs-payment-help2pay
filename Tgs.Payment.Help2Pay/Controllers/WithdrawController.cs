@@ -62,6 +62,7 @@ public class WithdrawController : ControllerBase
         [FromServices] IGetService<GetWithdrawFormQuery, WithdrawFormInfo?> getWithdrawFormService,
         [FromServices] IGetService<VerifyWithdrawConfirmHashCommand, bool> verifyHashCommandService,
         [FromServices] ICommandService<SaveWithdrawReturnCommand> saveReturnService,
+        [FromServices] IPaymentClient paymentClient,
         [FromForm] IFormCollection formData)
     {
         var jsonSerializerOptions = options.Value.SystemSerializerOptions;
@@ -108,29 +109,28 @@ public class WithdrawController : ControllerBase
             withdrawModel.Status,
             withdrawModel.Message);
 
-        if (withdrawModel.Status == "000")
+        if (withdrawModel.Status == "000" && withdrawForm.Status == PaymentFlowState.Approved)
         {
-            var formStatus = withdrawForm.Status == PaymentFlowState.Approved
-                ? PaymentFlowState.Paid
-                : withdrawForm.Status;
-
             await saveReturnService
-                    .ExecuteAsync(new SaveWithdrawReturnCommand(
-                        withdrawForm.Id,
-                        formStatus,
-                        returnData.Amount / withdrawForm.ApplyInfo.Settings.ExchangeRate,
-                        returnData))
-                    .ConfigureAwait(false);
+                .ExecuteAsync(new SaveWithdrawReturnCommand(
+                    withdrawForm.Id,
+                    returnData.Amount / withdrawForm.ApplyInfo.Settings.ExchangeRate,
+                    returnData))
+                .ConfigureAwait(false);
+
+            await paymentClient.PaidWithdrawAsync(
+                withdrawForm.Id,
+                withdrawForm.BrandId,
+                HttpContext.RequestAborted).ConfigureAwait(false);
         }
         else
         {
             await saveReturnService
-                    .ExecuteAsync(new SaveWithdrawReturnCommand(
-                        withdrawForm.Id,
-                        withdrawForm.Status,
-                        null,
-                        returnData))
-                    .ConfigureAwait(false);
+                .ExecuteAsync(new SaveWithdrawReturnCommand(
+                    withdrawForm.Id,
+                    null,
+                    returnData))
+                .ConfigureAwait(false);
         }
 
         return Ok("success");
