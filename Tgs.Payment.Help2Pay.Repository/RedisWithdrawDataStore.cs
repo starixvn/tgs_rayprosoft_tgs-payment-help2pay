@@ -35,7 +35,10 @@ internal class RedisWithdrawDataStore : IWithdrawDataStore
     {
         var dataKey = $"{_KeyPrefix}:{hash}";
 
-        return await _redisDatabase.StringSetAsync(dataKey, formId.ToString(), _Expire, When.NotExists)
-            .ConfigureAwait(false);
+        return await _redisDatabase.StringSetAsync(
+            dataKey,
+            formId.ToString(),
+            _Expire,
+            when: When.NotExists).ConfigureAwait(false);
     }
 }

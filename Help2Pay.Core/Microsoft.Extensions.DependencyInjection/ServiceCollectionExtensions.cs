@@ -59,15 +59,6 @@ public static class ServiceCollectionExtensions
             {
                 var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
                 options.PaymentServiceBaseUrl = help2PayOptions.PaymentServiceBaseUrl;
-
-                options.JsonSerializerOptions = options.JsonSerializerOptions = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    Converters =
-                        {
-                            new JsonStringEnumConverter()
-                        }
-                };
             })
             .AddPaymentClient();
 

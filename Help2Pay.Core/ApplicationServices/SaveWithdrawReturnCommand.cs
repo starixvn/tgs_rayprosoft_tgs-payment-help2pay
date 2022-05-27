@@ -4,6 +4,5 @@ namespace Tgs.Payment.Help2Pay.ApplicationServices;
 
 public record SaveWithdrawReturnCommand(
     Guid FormId,
-        PaymentFlowState State,
-        decimal? ActualAmount,
+    decimal? ActualAmount,
     Help2PayWithdrawReturn WithdrawReturn);
