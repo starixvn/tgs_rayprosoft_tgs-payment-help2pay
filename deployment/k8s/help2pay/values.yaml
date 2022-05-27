@@ -25,7 +25,10 @@ paymentQueryApiUrl: https://query.testingzone88.com
 callbackBaseUrl: https://dev-payment.rpgp.cc/help2pay
 paymentServiceBaseUrl: http://payment-api
 
-podAnnotations: {}
+podAnnotations:
+  prometheus.io/path: /metrics
+  prometheus.io/port: "52325"
+  prometheus.io/scrape: "true"
 
 podSecurityContext: {}
   # fsGroup: 2000
