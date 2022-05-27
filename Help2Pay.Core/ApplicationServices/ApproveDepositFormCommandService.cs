@@ -15,7 +15,8 @@ internal class ApproveDepositFormCommandService : ICommandService<ApproveDeposit
 
     public ValueTask ExecuteAsync(ApproveDepositFormCommand command, CancellationToken cancellationToken = default)
         => _paymentClient.ApproveDepositAsync(
-                command.FormId,
-                command.BrandId,
-                command.ActualAmount);
+            command.FormId,
+            command.BrandId,
+            command.ActualAmount,
+            cancellationToken);
 }

@@ -18,7 +18,8 @@ internal class SaveDepositReturnCommandService : ICommandService<SaveDepositRetu
 
     public ValueTask ExecuteAsync(SaveDepositReturnCommand command, CancellationToken cancellationToken = default)
         => _paymentServiceClient.SubmitDepositFormStatusAsync(
-                command.FormId,
-                command.State,
-                _help2PaySerializer.Serialize(command.DepositReturn));
+            command.FormId,
+            command.State,
+            _help2PaySerializer.Serialize(command.DepositReturn),
+            cancellationToken: cancellationToken);
 }
