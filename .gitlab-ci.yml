@@ -4,6 +4,7 @@ variables:
 stages:
   - build
   - test
+  - publish
 
 build-code:
   stage: build
@@ -34,3 +35,22 @@ unit-test:
     reports:
       junit: ./TestReports/*-TestReport.xml
 
+push-nuget:
+  stage: publish
+  script:
+    - dotnet pack -c $BuildConfiguration "Tgs.Payment.Help2Pay.Client/Tgs.Payment.Help2Pay.Client.csproj" --no-build --no-restore
+    - dotnet nuget push "Tgs.Payment.Help2Pay.Client/bin/$BuildConfiguration/*.nupkg" -s raypro-baget -k $NugetApiKey --skip-duplicate
+  needs:
+    - unit-test
+  only:
+    - main
+  cache:
+    key: $BuildCacheKey
+    untracked: true
+    policy: pull
+  artifacts:
+    name: Nuget
+    untracked: false
+    expire_in: "30 days"
+    paths:
+      - Tgs.Payment.Help2Pay.Client/bin/$BuildConfiguration/*.nupkg
