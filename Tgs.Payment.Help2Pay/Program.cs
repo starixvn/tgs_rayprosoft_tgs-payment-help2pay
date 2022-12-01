@@ -1,11 +1,13 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Tgs.Payment.Help2Pay;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,16 +29,18 @@ builder.Logging
         });
     });
 
-// Add services to the container.
 builder.Services
-    .AddHelp2Pay((options, sp) =>
-    {
-        var config = sp.GetRequiredService<IConfiguration>();
-        config.GetSection("Help2Pay").Bind(options);
+    .AddHttpClientLoggingHandler()
+    .AddHelp2Pay(
+        (options, sp) =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            config.GetSection("Help2Pay").Bind(options);
 
-        var jsonOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value;
-        options.SystemSerializerOptions = jsonOptions.JsonSerializerOptions;
-    })
+            var jsonOptions = sp.GetRequiredService<IOptions<JsonOptions>>().Value;
+            options.SystemSerializerOptions = jsonOptions.JsonSerializerOptions;
+        },
+        sp => sp.ResolveLoggingHandler<Help2PayOptions>())
     .UseRedis((options, sp) =>
     {
         var config = sp.GetRequiredService<IConfiguration>();
@@ -53,15 +57,23 @@ builder.Services.AddControllers()
     });
 
 builder.Services
-    .AddOptions<OtlpExporterOptions>()
-    .Configure<IConfiguration>((options, conifg) =>
+    .AddHttpLogging(logging =>
     {
-        var nodeIp = conifg.GetValue<string>("NODE_IP");
+        logging.LoggingFields = HttpLoggingFields.All;
+        logging.MediaTypeOptions.AddText("application/x-www-form-urlencoded");
+        logging.MediaTypeOptions.AddText("text/html");
+    });
+
+builder.Services
+    .AddOptions<OtlpExporterOptions>()
+    .Configure<IConfiguration>((options, config) =>
+    {
+        var nodeIp = config.GetValue<string>("NODE_IP");
 
         if (!string.IsNullOrWhiteSpace(nodeIp))
             options.Endpoint = new Uri($"http://{nodeIp}:4317");
 
-        conifg.GetSection("Opentelemetry:Tracing").Bind(options);
+        config.GetSection("Opentelemetry:Tracing").Bind(options);
     });
 
 builder.Services
@@ -89,11 +101,26 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+app.UseHttpLogging();
+
 app.MapControllers();
 app.MapHealthChecks("/healthz");
 app.MapProfileViewer();
-
 app.UseSwaggerUI();
 app.MapSwagger();
+
+app.Use(async (context, next) =>
+{
+    await next().ConfigureAwait(false);
+
+    var logger = context.RequestServices.GetService<ILoggerFactory>()?
+        .CreateLogger("Microsoft.AspNetCore.HttpLogging.HttpLoggingMiddleware");
+
+    if (logger?.IsEnabled(LogLevel.Information) == true)
+    {
+        using var stream = new StreamReader(context.Request.Body);
+        _ = await stream.ReadToEndAsync().ConfigureAwait(false);
+    }
+});
 
 app.Run();
