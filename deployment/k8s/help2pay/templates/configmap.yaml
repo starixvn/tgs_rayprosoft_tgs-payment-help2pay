@@ -16,6 +16,12 @@ data:
         "NatsUrl": "{{ .Values.nats }}",
         "CallbackBaseUrl": "{{ .Values.callbackBaseUrl }}",
         "PaymentServiceBaseUrl": "{{ .Values.paymentServiceBaseUrl }}"
+      },
+      "Logging": {
+        "LogLevel": {
+          "Microsoft.AspNetCore.HttpLogging": "Information",
+          "Tgs.Payment.Help2Pay.Help2PayOptions": "Information"
+        }
       }
     }
   monitor.settings.json: |
