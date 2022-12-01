@@ -39,7 +39,7 @@ public class WithdrawController : ControllerBase
 
         if (storedFormId == null || storedFormId.Value != formId)
         {
-            _logger.LogError($"Withdraw validataion input form id='{formId}' is not matched as expected form id='{storedFormId}'");
+            _logger.LogError($"Withdraw validation input form id='{formId}' is not matched as expected form id='{storedFormId}'");
             return "false";
         }
 

@@ -9,6 +9,24 @@ using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+    .AddJsonFile("/config/appsettings.json", true)
+    .AddEnvironmentVariables();
+
+builder.Logging
+    .AddOpenTelemetry(options =>
+    {
+        options.IncludeFormattedMessage = true;
+        options.ParseStateValues = true;
+        _ = options.AddFluentdForwardExporter(fluentOptions =>
+        {
+            var nodeIp = builder.Configuration.GetValue<string>("NODE_IP");
+            fluentOptions.Host = nodeIp;
+            fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME");
+            fluentOptions.UseMessagePack();
+        });
+    });
+
 // Add services to the container.
 builder.Services
     .AddHelp2Pay((options, sp) =>
@@ -34,14 +52,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
     });
 
-builder.Configuration.AddJsonFile("/config/appsettings.json", true);
-builder.Logging.AddTgsLog();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddHealthChecks();
-
 builder.Services
     .AddOptions<OtlpExporterOptions>()
     .Configure<IConfiguration>((options, conifg) =>
@@ -54,33 +64,36 @@ builder.Services
         conifg.GetSection("Opentelemetry:Tracing").Bind(options);
     });
 
-builder.Services.AddOpenTelemetryTracing(builder => builder
-    .SetResourceBuilder(ResourceBuilder.CreateDefault()
-    .AddEnvironmentVariableDetector())
-    .AddSource("Tgs.*")
-    .AddAspNetCoreInstrumentation()
-    .AddHttpClientInstrumentation()
-    .AddOtlpExporter());
+builder.Services
+    .AddOpenTelemetryTracing(builder => builder
+        .SetResourceBuilder(ResourceBuilder.CreateDefault()
+            .AddEnvironmentVariableDetector())
+        .AddSource("Tgs.*")
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddProfileViewExporter()
+        .AddOtlpExporter())
+    .Configure<AspNetCoreInstrumentationOptions>(options => options.Filter =
+        httpContext => !httpContext.Request.Path.HasValue
+                       || !httpContext.Request.Path.StartsWithSegments("/swagger")
+                       && !httpContext.Request.Path.StartsWithSegments("/healthz")
+                       && !httpContext.Request.Path.StartsWithSegments("/metrics")
+                       && !new[] { "html", "ico", "png", "jpg" }.Any(
+                           ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
+    .AddProfileViewer();
 
-builder.Services.Configure<AspNetCoreInstrumentationOptions>(options =>
-{
-    options.Filter = httpContext =>
-    {
-        return !httpContext.Request.Path.HasValue
-            || !httpContext.Request.Path.StartsWithSegments("/swagger")
-            && !httpContext.Request.Path.StartsWithSegments("/healthz")
-            && !httpContext.Request.Path.StartsWithSegments("/profiler/")
-            && !httpContext.Request.Path.StartsWithSegments("/metrics")
-            && !new[] { "html", "ico", "png", "jpg" }.Any(
-                ext => httpContext.Request.Path.Value.EndsWith($".{ext}"));
-    };
-});
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
-app.UseSwaggerUI();
-app.MapSwagger();
 app.MapControllers();
 app.MapHealthChecks("/healthz");
+app.MapProfileViewer();
+
+app.UseSwaggerUI();
+app.MapSwagger();
 
 app.Run();
