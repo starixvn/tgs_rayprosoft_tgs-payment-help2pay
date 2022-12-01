@@ -31,7 +31,7 @@ public class WithdrawController : ControllerBase
 
         if (string.IsNullOrEmpty(hash))
         {
-            _logger.LogError("Withdraw form id='{formId}', input hash is null or empty", formId);
+            _logger.LogWarning("Withdraw form id='{formId}', input hash is null or empty", formId);
             return "false";
         }
 
@@ -39,7 +39,7 @@ public class WithdrawController : ControllerBase
 
         if (storedFormId == null || storedFormId.Value != formId)
         {
-            _logger.LogError("Withdraw validation input form id='{formId}' is not matched as expected form id='{storedFormId}'", formId, storedFormId);
+            _logger.LogWarning("Withdraw validation input form id='{formId}' is not matched as expected form id='{storedFormId}'", formId, storedFormId);
             return "false";
         }
 
@@ -49,7 +49,7 @@ public class WithdrawController : ControllerBase
 
         if (info!.Status == PaymentFlowState.Paid)
         {
-            _logger.LogError("Withdraw form with id='{formId}' is paid already", formId);
+            _logger.LogWarning("Withdraw form with id='{formId}' is paid already", formId);
             return "false";
         }
 
