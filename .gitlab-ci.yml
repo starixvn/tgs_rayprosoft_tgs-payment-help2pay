@@ -1,0 +1,56 @@
+variables:
+  BuildCacheKey: Help2Pay.$CI_PIPELINE_IID
+
+stages:
+  - build
+  - test
+  - publish
+
+build-code:
+  stage: build
+  script:
+    - dotnet build -c $BuildConfiguration
+  only:
+    - merge_requests
+    - main
+  cache:
+    key: $BuildCacheKey
+    untracked: true
+
+unit-test:
+  stage: test
+  script:
+    - dotnet test -c $BuildConfiguration -l:"junit;LogFilePath=../TestReports/{assembly}-TestReport.xml" --no-restore --no-build
+  needs:
+    - build-code
+  only:
+    - merge_requests
+    - main
+  cache:
+    key: $BuildCacheKey
+    untracked: true
+    policy: pull
+  artifacts:
+    when: always
+    reports:
+      junit: ./TestReports/*-TestReport.xml
+
+push-nuget:
+  stage: publish
+  script:
+    - dotnet pack -c $BuildConfiguration "Tgs.Payment.Help2Pay.Client/Tgs.Payment.Help2Pay.Client.csproj" --no-build --no-restore
+    - dotnet nuget push "Tgs.Payment.Help2Pay.Client/bin/$BuildConfiguration/*.nupkg" -s raypro-baget -k $NugetApiKey --skip-duplicate
+  needs:
+    - unit-test
+  only:
+    - main
+  cache:
+    key: $BuildCacheKey
+    untracked: true
+    policy: pull
+  artifacts:
+    name: Nuget
+    untracked: false
+    expire_in: "30 days"
+    paths:
+      - Tgs.Payment.Help2Pay.Client/bin/$BuildConfiguration/*.nupkg
