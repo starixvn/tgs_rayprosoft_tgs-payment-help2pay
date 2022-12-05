@@ -44,7 +44,7 @@ spec:
                 secretKeyRef:
                   name: tgs-connections
                   key: redis
-            - name: Help2Pay__NatsUrl
+            - name: ConnectionStrings__Nats
               valueFrom:
                 secretKeyRef:
                   name: tgs-connections
