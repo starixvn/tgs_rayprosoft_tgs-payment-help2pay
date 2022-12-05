@@ -106,7 +106,6 @@ deploy-dev:
   variables:
     GIT_STRATEGY: none
     namespace: dev
-    kube_config: KubeConfig_Raypro_dev
   environment:
     name: dev
   needs:
@@ -117,7 +116,7 @@ deploy-dev:
   only:
     - main
   before_script:
-    - *export-tag
+    - export KUBECONFIG=$KubeConfig_Raypro_dev
   script:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
@@ -152,7 +151,6 @@ deploy-staging:
   variables:
     GIT_STRATEGY: none
     namespace: staging
-    kube_config: KubeConfig_Raypro_staging
   environment:
     name: staging
   needs:
@@ -163,7 +161,7 @@ deploy-staging:
     - main
   when: manual
   before_script:
-    - *export-tag
+    - export KUBECONFIG=$KubeConfig_Raypro_staging
   script:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
@@ -198,7 +196,6 @@ deploy-prod:
   variables:
     GIT_STRATEGY: none
     namespace: prod
-    kube_config: KubeConfig_Raypro_prod
   environment:
     name: prod
   needs:
@@ -209,7 +206,7 @@ deploy-prod:
     - main
   when: manual
   before_script:
-    - *export-tag
+    - export KUBECONFIG=$KubeConfig_Raypro_prod
   script:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$TgsSettingKey})
     - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
