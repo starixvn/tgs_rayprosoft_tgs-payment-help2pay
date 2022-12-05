@@ -1,16 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <RootNamespace>Tgs.Payment.Help2Pay</RootNamespace>
-    <LangVersion>10</LangVersion>
     <PackageId>Tgs.Payment.Help2Pay.Client</PackageId>
     <PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment-help2pay</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment-help2pay.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>tgs payment</PackageTags>
-    <Version>0.0.5</Version>
+    <Version>0.0.6</Version>
     <Authors>Raypro</Authors>
   </PropertyGroup>
 
