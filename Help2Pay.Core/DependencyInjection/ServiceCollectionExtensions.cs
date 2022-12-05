@@ -19,17 +19,7 @@ public static class ServiceCollectionExtensions
             .Services
             .RegisterAllServiceUtilityTypes(Assembly.GetExecutingAssembly(), ServiceLifetime.Transient)
             .AddTransient<Help2PayHasher>()
-            .AddTransient<Help2PaySerializer>()
-            .AddMessageQueue()
-            .AddNatsMessageQueue(config => config
-                .ConfigQueueOptions((options, sp) =>
-                {
-                    var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
-                    options.Url = help2PayOptions.NatsUrl;
-                })
-                .AddProcessor<DepositProcessor>("tgs.payment.help2pay.deposit", "tgs.payment.help2pay.deposit")
-                .AddProcessor<WithdrawProcessor>("tgs.payment.help2pay.withdraw", "tgs.payment.help2pay.withdraw"))
-            .AddNatsGlobPatternExchange("*");
+            .AddTransient<Help2PaySerializer>();
 
         _ = services
             .AddHttpClient<Help2PayDepositClient>()
