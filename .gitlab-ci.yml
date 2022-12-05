@@ -84,12 +84,12 @@ push-k8s-template:
   script:
     - *export-tag
     - mkdir -p artifacts/k8s
-    - cp -R deployment/k8s/$HelmTemplateServiceFolderName artifacts/k8s/
+    - cp -R deployment/k8s/$HelmTemplateFolderName artifacts/k8s/
     - |
       yq -i e '
         .image.repository = strenv(ImageName) |
         .image.tag = strenv(Tag)
-      ' artifacts/k8s/$HelmTemplateServiceFolderName/values.yaml
+      ' artifacts/k8s/$HelmTemplateFolderName/values.yaml
   needs:
     - unit-test
   only:
