@@ -6,16 +6,14 @@ metadata:
 data:
   appsettings.json: |
     {
-      "ConnectionStrings": {
-        "Redis": "{{ .Values.connectionString.redis }}"
-      },
       "Help2Pay": {
-        "PaymentDepositApiUrl": "{{ .Values.paymentDepositApiUrl }}",
-        "PaymentWithdrawApiUrl": "{{ .Values.paymentWithdrawApiUrl }}",
-        "PaymentQueryApiUrl": "{{ .Values.paymentQueryApiUrl }}",
-        "NatsUrl": "{{ .Values.nats }}",
-        "CallbackBaseUrl": "{{ .Values.callbackBaseUrl }}",
-        "PaymentServiceBaseUrl": "{{ .Values.paymentServiceBaseUrl }}"
+        "PaymentServiceBaseUrl": "http://payment-api"
+      },
+      "Logging": {
+        "LogLevel": {
+          "Microsoft.AspNetCore.HttpLogging": "Information",
+          "Tgs.Payment.Help2Pay.Help2PayOptions": "Information"
+        }
       }
     }
   monitor.settings.json: |

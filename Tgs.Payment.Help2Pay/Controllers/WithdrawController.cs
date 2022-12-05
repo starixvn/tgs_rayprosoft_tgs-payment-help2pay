@@ -27,11 +27,11 @@ public class WithdrawController : ControllerBase
         [FromServices] IGetService<GetWithdrawFormQuery, WithdrawFormInfo?> getWithdrawFormService,
         [FromServices] IWithdrawDataStore store)
     {
-        _logger.LogInformation($"Withdraw validation input: transId='{formId}', hash={hash}");
+        _logger.LogInformation("Withdraw validation input: transId='{formId}', hash={hash}", formId, hash);
 
         if (string.IsNullOrEmpty(hash))
         {
-            _logger.LogError($"Withdraw form id='{formId}', input hash is null or empty");
+            _logger.LogWarning("Withdraw form id='{formId}', input hash is null or empty", formId);
             return "false";
         }
 
@@ -39,7 +39,7 @@ public class WithdrawController : ControllerBase
 
         if (storedFormId == null || storedFormId.Value != formId)
         {
-            _logger.LogError($"Withdraw validataion input form id='{formId}' is not matched as expected form id='{storedFormId}'");
+            _logger.LogWarning("Withdraw validation input form id='{formId}' is not matched as expected form id='{storedFormId}'", formId, storedFormId);
             return "false";
         }
 
@@ -49,7 +49,7 @@ public class WithdrawController : ControllerBase
 
         if (info!.Status == PaymentFlowState.Paid)
         {
-            _logger.LogError($"Withdraw form with id='{formId}' is paid already");
+            _logger.LogWarning("Withdraw form with id='{formId}' is paid already", formId);
             return "false";
         }
 
@@ -70,7 +70,7 @@ public class WithdrawController : ControllerBase
         var dict = formData.ToDictionary(x => x.Key, x => x.Value.ToString());
         var data = JsonSerializer.Serialize(dict, jsonSerializerOptions);
 
-        _logger.LogInformation($"Withdraw callback: {data}");
+        _logger.LogInformation("Withdraw callback: {data}", data);
 
         var withdrawModel = JsonSerializer.Deserialize<WithdrawConfirmViewModel>(data, jsonSerializerOptions)!;
 

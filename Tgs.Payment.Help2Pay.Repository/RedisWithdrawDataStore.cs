@@ -28,7 +28,7 @@ internal class RedisWithdrawDataStore : IWithdrawDataStore
         var value = await _redisDatabase.StringGetAsync(dataKey)
             .ConfigureAwait(false);
 
-        return value.IsNullOrEmpty ? null : Guid.Parse(value);
+        return value.IsNullOrEmpty ? null : Guid.Parse(value!);
     }
 
     public async ValueTask<bool> StoreHashAsync(string hash, Guid formId)

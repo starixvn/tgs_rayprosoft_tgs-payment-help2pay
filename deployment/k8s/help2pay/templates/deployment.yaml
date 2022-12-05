@@ -39,6 +39,36 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
+            - name: ConnectionStrings__Redis
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: redis
+            - name: Help2Pay__NatsUrl
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: nats
+            - name: Help2Pay__PaymentDepositApiUrl
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: payment-help2pay-paymentDepositApiUrl
+            - name: Help2Pay__PaymentWithdrawApiUrl
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: payment-help2pay-paymentWithdrawApiUrl
+            - name: Help2Pay__PaymentQueryApiUrl
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: payment-help2pay-paymentQueryApiUrl
+            - name: Help2Pay__CallbackBaseUrl
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: payment-help2pay-callback
             - name: DOTNET_DiagnosticPorts
               value: /diag/port
           ports:

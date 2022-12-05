@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 using Tgs.Payment.Help2Pay;
 using Tgs.Payment.Help2Pay.Configuration;
@@ -10,7 +8,10 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static Help2PayConfiguration AddHelp2Pay(this IServiceCollection services, Action<Help2PayOptions, IServiceProvider> configure)
+    public static Help2PayConfiguration AddHelp2Pay(
+        this IServiceCollection services,
+        Action<Help2PayOptions, IServiceProvider> configure,
+        Func<IServiceProvider, DelegatingHandler> httpClientMessageHandlerFactory)
     {
         _ = services
             .AddOptions<Help2PayOptions>()
@@ -31,35 +32,40 @@ public static class ServiceCollectionExtensions
             .AddNatsGlobPatternExchange("*");
 
         _ = services
-            .AddHttpClient<Help2PayDepositClient>((sp, httpClient)
-            =>
+            .AddHttpClient<Help2PayDepositClient>()
+            .ConfigureHttpClient((sp, httpClient) =>
             {
                 var options = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
                 httpClient.BaseAddress = options.PaymentDepositApiUrl;
-            });
+            })
+            .AddHttpMessageHandler(httpClientMessageHandlerFactory);
 
         _ = services
-            .AddHttpClient<Help2PayQueryClient>((sp, httpClient)
-            =>
+            .AddHttpClient<Help2PayQueryClient>()
+            .ConfigureHttpClient((sp, httpClient) =>
             {
                 var options = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
                 httpClient.BaseAddress = options.PaymentQueryApiUrl;
-            });
+            })
+            .AddHttpMessageHandler(httpClientMessageHandlerFactory);
 
         _ = services
-            .AddHttpClient<Help2PayWithdrawClient>((sp, httpClient)
-            =>
+            .AddHttpClient<Help2PayWithdrawClient>()
+            .ConfigureHttpClient((sp, httpClient) =>
             {
                 var options = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
                 httpClient.BaseAddress = options.PaymentWithdrawApiUrl;
-            });
+            })
+            .AddHttpMessageHandler(httpClientMessageHandlerFactory);
 
         _ = services
-            .AddPaymentServiceClient((options, sp) =>
-            {
-                var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
-                options.PaymentServiceBaseUrl = help2PayOptions.PaymentServiceBaseUrl;
-            })
+            .AddPaymentServiceClient(httpClientBuilder => httpClientBuilder
+                .ConfigureHttpClient((sp, httpClient) =>
+                {
+                    var help2PayOptions = sp.GetRequiredService<IOptions<Help2PayOptions>>().Value;
+                    httpClient.BaseAddress = help2PayOptions.PaymentServiceBaseUrl;
+                })
+                .AddHttpMessageHandler(httpClientMessageHandlerFactory))
             .AddPaymentClient();
 
         var configuration = new Help2PayConfiguration(services);
