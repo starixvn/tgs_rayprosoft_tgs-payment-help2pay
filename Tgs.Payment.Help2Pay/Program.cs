@@ -8,6 +8,7 @@ using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.Payment.Help2Pay;
+using Tgs.Payment.Help2Pay.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,15 @@ builder.Services
 
         options.ConnectionString = config.GetConnectionString("Redis");
     });
+builder
+    .Services
+    .AddMessageQueue()
+    .AddNatsMessageQueue(config => config
+    .ConfigQueueOptions((options, _) =>
+        options.Url = builder.Configuration.GetConnectionString("Nats"))
+    .AddProcessor(ProcessorTypes.DepositProcessorType, "tgs.payment.help2pay.deposit", "tgs.payment.help2pay.deposit")
+    .AddProcessor(ProcessorTypes.WithdrawProcessorType, "tgs.payment.help2pay.withdraw", "tgs.payment.help2pay.withdraw"))
+.AddNatsGlobPatternExchange("*");
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
